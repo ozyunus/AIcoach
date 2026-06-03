@@ -1,0 +1,242 @@
+/* ============================================================
+   Writing Coach — design tokens & base styles
+   Clean blue tech: premium academic, rounded cards, soft shadows
+   ============================================================ */
+
+:root {
+  /* brand — overridden at runtime by Tweaks */
+  --primary: #2f5fe0;
+  --primary-ink: #ffffff;
+
+  /* derived tints (modern color-mix) */
+  --primary-tint:    color-mix(in oklab, var(--primary) 10%, #fff);
+  --primary-tint-2:  color-mix(in oklab, var(--primary) 18%, #fff);
+  --primary-soft:    color-mix(in oklab, var(--primary) 6%,  #fff);
+  --primary-press:   color-mix(in oklab, var(--primary) 82%, #000);
+
+  /* neutral ground — cool off-white */
+  --bg:        oklch(0.984 0.005 255);
+  --bg-sunken: oklch(0.968 0.007 255);
+  --card:      #ffffff;
+
+  --ink:   oklch(0.255 0.026 264);
+  --ink-2: oklch(0.46 0.022 264);
+  --ink-3: oklch(0.62 0.016 264);
+  --ink-4: oklch(0.74 0.012 264);
+
+  --line:   oklch(0.925 0.006 264);
+  --line-2: oklch(0.955 0.005 264);
+
+  /* semantic accents — shared L≈0.62 C≈0.15, hue varies */
+  --good:   oklch(0.64 0.13 158);
+  --good-tint: color-mix(in oklab, var(--good) 12%, #fff);
+  --warn:   oklch(0.78 0.13 78);
+  --warn-tint: color-mix(in oklab, var(--warn) 16%, #fff);
+  --bad:    oklch(0.63 0.18 24);
+  --bad-tint: color-mix(in oklab, var(--bad) 10%, #fff);
+  --violet: oklch(0.58 0.16 296);
+  --violet-tint: color-mix(in oklab, var(--violet) 12%, #fff);
+
+  --shadow-sm:   0 1px 2px rgba(17,24,39,0.05);
+  --shadow-card: 0 1px 2px rgba(17,24,39,0.05), 0 8px 20px -14px rgba(17,24,39,0.18);
+  --shadow-pop:  0 12px 34px -16px rgba(17,24,39,0.28), 0 2px 6px rgba(17,24,39,0.06);
+  --shadow-cta:  0 8px 22px -8px color-mix(in oklab, var(--primary) 55%, transparent);
+
+  --r-card: 24px;
+  --r-md: 16px;
+  --r-sm: 12px;
+
+  --ff: "Plus Jakarta Sans", -apple-system, system-ui, sans-serif;
+  --ff-num: "Space Grotesk", var(--ff);
+
+  --tab-h: 86px;
+  --t-fast: 180ms;
+  --ease: cubic-bezier(0.22, 0.61, 0.36, 1);
+}
+
+* { box-sizing: border-box; -webkit-tap-highlight-color: transparent; }
+
+body {
+  margin: 0;
+  font-family: var(--ff);
+  background: #e9eaf0;
+  color: var(--ink);
+  -webkit-font-smoothing: antialiased;
+}
+
+/* App canvas inside the phone */
+.app {
+  position: absolute;
+  inset: 0;
+  background: var(--bg);
+  display: flex;
+  flex-direction: column;
+  font-family: var(--ff);
+  color: var(--ink);
+}
+
+/* scroll region between header and tab bar */
+.screen {
+  position: absolute;
+  inset: 0;
+  overflow-y: auto;
+  overflow-x: hidden;
+  -webkit-overflow-scrolling: touch;
+}
+.screen::-webkit-scrollbar { width: 0; height: 0; }
+
+.screen-pad {
+  padding: 0 18px 30px;
+}
+.pad-top { padding-top: 8px; }
+
+/* status-bar safe area inside the screen */
+.safe-top { height: 62px; flex: none; }
+.tab-safe { height: calc(var(--tab-h) + 6px); }
+
+/* ---- type ---- */
+.h-eyebrow { font-size: 12px; font-weight: 700; letter-spacing: 0.08em; text-transform: uppercase; color: var(--ink-3); margin: 0; white-space: nowrap; }
+.h-screen { font-family: var(--ff); font-size: 27px; font-weight: 800; letter-spacing: -0.02em; margin: 0; color: var(--ink); }
+.h-sec { font-size: 17px; font-weight: 700; letter-spacing: -0.01em; margin: 0; color: var(--ink); }
+.t-body { font-size: 14.5px; line-height: 1.5; color: var(--ink-2); margin: 0; }
+.t-sm { font-size: 13px; line-height: 1.45; color: var(--ink-3); margin: 0; }
+.t-num { font-family: var(--ff-num); font-feature-settings: "tnum"; letter-spacing: -0.02em; }
+.t-mono { font-family: "Space Grotesk", monospace; }
+
+/* ---- card ---- */
+.card {
+  background: var(--card);
+  border-radius: var(--r-card);
+  box-shadow: var(--shadow-card);
+  border: 1px solid var(--line-2);
+}
+.card-pad { padding: 18px; }
+
+/* section spacing */
+.stack > * + * { margin-top: 14px; }
+.row { display: flex; align-items: center; }
+.row-gap { display: flex; align-items: center; gap: 10px; }
+.between { display: flex; align-items: center; justify-content: space-between; }
+.sec-head { display: flex; align-items: baseline; justify-content: space-between; margin: 26px 2px 12px; }
+.sec-head .link { font-size: 13.5px; font-weight: 600; color: var(--primary); }
+
+/* ---- buttons ---- */
+.btn {
+  appearance: none; border: none; cursor: pointer;
+  font-family: var(--ff); font-weight: 700; font-size: 16px;
+  border-radius: var(--r-md); padding: 16px 20px;
+  display: inline-flex; align-items: center; justify-content: center; gap: 9px;
+  transition: transform var(--t-fast) var(--ease), box-shadow var(--t-fast) var(--ease), background var(--t-fast);
+  user-select: none; white-space: nowrap;
+}
+.btn:active { transform: scale(0.975); }
+.btn-primary { background: var(--primary); color: var(--primary-ink); box-shadow: var(--shadow-cta); }
+.btn-primary:active { background: var(--primary-press); }
+.btn-ghost { background: var(--primary-tint); color: var(--primary); }
+.btn-soft { background: var(--bg-sunken); color: var(--ink); }
+.btn-block { width: 100%; }
+
+/* pill / chip / badge */
+.chip {
+  display: inline-flex; align-items: center; gap: 6px;
+  font-size: 12.5px; font-weight: 600; border-radius: 999px;
+  padding: 6px 11px; background: var(--bg-sunken); color: var(--ink-2);
+  white-space: nowrap;
+}
+.chip-primary { background: var(--primary-tint); color: var(--primary); }
+.chip-good { background: var(--good-tint); color: color-mix(in oklab, var(--good) 78%, #000); }
+.chip-warn { background: var(--warn-tint); color: color-mix(in oklab, var(--warn) 60%, #000); }
+.chip-bad  { background: var(--bad-tint);  color: color-mix(in oklab, var(--bad) 78%, #000); }
+
+/* progress bars */
+.bar-track { background: var(--bg-sunken); border-radius: 999px; overflow: hidden; height: 9px; width: 100%; }
+.bar-fill { height: 100%; border-radius: 999px; background: var(--primary);
+  width: 0; transition: width 900ms var(--ease); }
+
+/* segmented control */
+.seg {
+  display: inline-flex; background: var(--bg-sunken); border-radius: 12px; padding: 3px; gap: 2px;
+  position: relative;
+}
+.seg button {
+  appearance: none; border: none; background: transparent; cursor: pointer;
+  font-family: var(--ff); font-weight: 700; font-size: 13px; color: var(--ink-3);
+  padding: 7px 14px; border-radius: 9px; position: relative; z-index: 1;
+  transition: color var(--t-fast);
+}
+.seg button.on { color: var(--ink); }
+.seg .seg-thumb {
+  position: absolute; top: 3px; bottom: 3px; border-radius: 9px;
+  background: #fff; box-shadow: var(--shadow-sm);
+  transition: left var(--t-fast) var(--ease), width var(--t-fast) var(--ease); z-index: 0;
+}
+
+/* bottom tab bar */
+.tabbar {
+  position: absolute; left: 0; right: 0; bottom: 0; height: var(--tab-h);
+  padding: 9px 10px 30px;
+  display: flex; align-items: flex-start; justify-content: space-around;
+  background: color-mix(in oklab, var(--card) 80%, transparent);
+  backdrop-filter: saturate(180%) blur(20px);
+  -webkit-backdrop-filter: saturate(180%) blur(20px);
+  border-top: 1px solid var(--line-2);
+  z-index: 40;
+}
+.tab {
+  appearance: none; border: none; background: transparent; cursor: pointer;
+  display: flex; flex-direction: column; align-items: center; gap: 4px;
+  padding: 4px 6px; width: 64px; color: var(--ink-4);
+  transition: color var(--t-fast);
+}
+.tab .tlabel { font-size: 10.5px; font-weight: 600; letter-spacing: 0.01em; }
+.tab.on { color: var(--primary); }
+.tab .tab-write {
+  width: 50px; height: 36px; margin-top: -10px; border-radius: 14px;
+  background: var(--primary); color: #fff; display: flex; align-items: center; justify-content: center;
+  box-shadow: var(--shadow-cta);
+}
+
+/* header bar */
+.appbar {
+  position: relative; z-index: 30; padding: 4px 18px 10px;
+  display: flex; align-items: center; justify-content: space-between;
+  background: linear-gradient(var(--bg), color-mix(in oklab, var(--bg) 60%, transparent));
+}
+
+/* avatar */
+.avatar {
+  border-radius: 999px; background: var(--primary-tint-2); color: var(--primary);
+  display: flex; align-items: center; justify-content: center; font-weight: 800;
+  font-family: var(--ff-num); flex: none;
+}
+
+/* ---- animations ---- */
+@keyframes fadeUp { from { opacity: 0; transform: translateY(10px); } to { opacity: 1; transform: none; } }
+@keyframes fadeIn { from { opacity: 0; } to { opacity: 1; } }
+@keyframes pushIn { from { opacity: 0; transform: translateX(26px); } to { opacity: 1; transform: none; } }
+@keyframes popIn { from { opacity: 0; transform: scale(0.96); } to { opacity: 1; transform: none; } }
+@keyframes spin { to { transform: rotate(360deg); } }
+@keyframes pulse { 0%,100% { opacity: 1; } 50% { opacity: 0.45; } }
+@keyframes sheetUp { from { transform: translateY(100%); } to { transform: none; } }
+@keyframes scrim { from { opacity: 0; } to { opacity: 1; } }
+
+.anim-fade { animation: fadeIn 280ms var(--ease) both; }
+.anim-push { animation: pushIn 320ms var(--ease) both; }
+.rise > * { animation: fadeUp 520ms var(--ease) both; }
+.rise > *:nth-child(1) { animation-delay: 40ms; }
+.rise > *:nth-child(2) { animation-delay: 100ms; }
+.rise > *:nth-child(3) { animation-delay: 160ms; }
+.rise > *:nth-child(4) { animation-delay: 220ms; }
+.rise > *:nth-child(5) { animation-delay: 280ms; }
+.rise > *:nth-child(6) { animation-delay: 340ms; }
+.rise > *:nth-child(7) { animation-delay: 400ms; }
+.rise > *:nth-child(8) { animation-delay: 460ms; }
+
+/* motion off */
+.no-motion *, .no-motion *::before, .no-motion *::after {
+  animation-duration: 0.001ms !important;
+  transition-duration: 0.001ms !important;
+}
+
+/* trend stroke draw */
+.spark-path { transition: stroke-dashoffset 1100ms var(--ease); }
