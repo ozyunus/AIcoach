@@ -20,6 +20,7 @@ Firebase + Claude akisini dogrulama.
 - [x] Firebase proje ayarlari ve platform config dosyalari dogrulandi.
 - [x] Anthropic secret/model config akisi deploy oncesi kontrol edildi.
 - [x] Ilk duzenli MVP commit'i olusturuldu.
+- [x] iOS release/TestFlight runbook'u eklendi.
 
 ## Mevcut Durum
 

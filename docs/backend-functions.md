@@ -66,6 +66,9 @@ live in Firebase Secret Manager, not in Flutter or Firestore:
 firebase functions:secrets:set ANTHROPIC_API_KEY --project aicoach-604d8
 ```
 
+Firebase Functions secrets use Google Secret Manager. The Firebase project must
+be on the Blaze plan before this command can complete.
+
 The function defaults to `claude-sonnet-4-6`, which is a valid Anthropic API
 model ID as of 2026-06-18. Treat the model ID as an explicit deploy-time choice,
 not an auto-updating "latest" alias. Override it with the `ANTHROPIC_MODEL`
@@ -99,7 +102,7 @@ npm --prefix functions run build
 Deploy:
 
 ```sh
-firebase deploy --only functions
+firebase deploy --only functions --project aicoach-604d8
 ```
 
 Run Flutter against callable functions:

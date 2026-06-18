@@ -108,6 +108,9 @@ Configure the Anthropic key in Firebase Secret Manager:
 firebase functions:secrets:set ANTHROPIC_API_KEY --project aicoach-604d8
 ```
 
+The Firebase project must be on the Blaze plan before Secret Manager can be
+enabled for Functions secrets.
+
 Deploy functions:
 
 ```sh
@@ -136,5 +139,6 @@ function contract and deployment notes.
 - [Architecture](docs/architecture.md)
 - [Firestore schema](docs/firestore-schema.md)
 - [Backend functions](docs/backend-functions.md)
+- [iOS release runbook](docs/ios-release.md)
 - [Roadmap](docs/roadmap.md)
 - [Active TODO](TODO.md)
