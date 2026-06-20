@@ -2,6 +2,7 @@ import 'package:ai_coach/src/core/application/writing_coach_state.dart';
 import 'package:ai_coach/src/core/design/app_colors.dart';
 import 'package:ai_coach/src/core/design/app_components.dart';
 import 'package:ai_coach/src/core/design/app_spacing.dart';
+import 'package:ai_coach/src/core/design/app_typography.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
@@ -47,6 +48,13 @@ class _WriteScreenState extends ConsumerState<WriteScreen> {
     return AppScreen(
       screenKey: const ValueKey('screen-write'),
       title: 'Write',
+      subtitle: 'Task 2 practice - 1 credit per analysis',
+      trailing: AppPill(
+        icon: Icons.bolt_rounded,
+        label: '${user?.credits ?? 0}',
+        backgroundColor: context.colors.warnTint,
+        foregroundColor: context.colors.warn,
+      ),
       children: [
         _PromptCard(examType: user?.examType ?? ExamType.ielts),
         _EditorCard(
@@ -152,11 +160,15 @@ class _EditorCard extends StatelessWidget {
                 AppPill(
                   icon: Icons.bolt_rounded,
                   label: '$credits credits',
-                  backgroundColor: colors.goodTint,
-                  foregroundColor: colors.good,
+                  backgroundColor: colors.warnTint,
+                  foregroundColor: colors.warn,
                 ),
                 const Spacer(),
-                TextButton(onPressed: onSample, child: const Text('Sample')),
+                TextButton(
+                  key: const ValueKey('load-sample-essay'),
+                  onPressed: onSample,
+                  child: const Text('Sample'),
+                ),
                 TextButton(onPressed: onClear, child: const Text('Clear')),
               ],
             ),
@@ -177,7 +189,7 @@ class _EditorCard extends StatelessWidget {
             ),
             style: Theme.of(
               context,
-            ).textTheme.bodyLarge?.copyWith(color: colors.ink, height: 1.55),
+            ).textTheme.bodyLarge?.copyWith(color: colors.ink, height: 1.62),
           ),
           Divider(height: 1, color: colors.line2),
           Padding(
@@ -204,7 +216,10 @@ class _EditorCard extends StatelessWidget {
                   ],
                 ),
                 const SizedBox(height: 10),
-                AppProgressBar(value: progress),
+                AppProgressBar(
+                  value: progress,
+                  color: wordCount >= 250 ? colors.good : colors.primary,
+                ),
                 const SizedBox(height: 16),
                 ElevatedButton.icon(
                   key: const ValueKey('submit-essay'),
@@ -262,51 +277,87 @@ class _AnalysisResultCard extends StatelessWidget {
   Widget build(BuildContext context) {
     final colors = context.colors;
 
-    return DesignCard(
+    return GradientCard(
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
           Row(
-            crossAxisAlignment: CrossAxisAlignment.end,
             children: [
-              Text(
-                analysis.rawScore,
-                style: Theme.of(context).textTheme.displaySmall?.copyWith(
-                  color: colors.primary,
-                  fontWeight: FontWeight.w900,
+              ScoreRing(
+                value: analysis.normalizedScore,
+                child: Column(
+                  mainAxisSize: MainAxisSize.min,
+                  children: [
+                    Text(
+                      '${analysis.normalizedScore}',
+                      style: AppTypography.number(
+                        colors: colors,
+                        size: 34,
+                        weight: FontWeight.w800,
+                      ),
+                    ),
+                    Text(
+                      '/100',
+                      style: Theme.of(context).textTheme.labelSmall?.copyWith(
+                        color: colors.ink4,
+                        fontWeight: FontWeight.w800,
+                      ),
+                    ),
+                  ],
                 ),
               ),
-              const SizedBox(width: 8),
-              Padding(
-                padding: const EdgeInsets.only(bottom: 7),
-                child: Text(
-                  '${analysis.normalizedScore}/100 health',
-                  style: Theme.of(context).textTheme.labelLarge?.copyWith(
-                    color: colors.ink3,
-                    fontWeight: FontWeight.w800,
-                  ),
+              const SizedBox(width: 18),
+              Expanded(
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    Text(
+                      'Estimated band',
+                      style: Theme.of(context).textTheme.labelSmall?.copyWith(
+                        color: colors.ink3,
+                        fontWeight: FontWeight.w900,
+                      ),
+                    ),
+                    const SizedBox(height: 4),
+                    Text(
+                      analysis.rawScore,
+                      style: AppTypography.number(
+                        colors: colors,
+                        size: 46,
+                        color: colors.ink,
+                        weight: FontWeight.w800,
+                      ),
+                    ),
+                    const SizedBox(height: 8),
+                    AppPill(
+                      icon: Icons.trending_up_rounded,
+                      label: '+0.5 from last',
+                      backgroundColor: colors.goodTint,
+                      foregroundColor: colors.good,
+                    ),
+                  ],
                 ),
               ),
             ],
           ),
-          const SizedBox(height: 10),
+          const SizedBox(height: 16),
           Text(
             analysis.generalFeedback,
             style: Theme.of(
               context,
             ).textTheme.bodyMedium?.copyWith(color: colors.ink2, height: 1.45),
           ),
-          const SizedBox(height: 18),
+          const SizedBox(height: 20),
           Text(
             'Skill breakdown',
             style: Theme.of(
               context,
             ).textTheme.titleMedium?.copyWith(fontWeight: FontWeight.w900),
           ),
-          const SizedBox(height: 10),
+          const SizedBox(height: 12),
           ...analysis.skillScores.map(
             (skill) => Padding(
-              padding: const EdgeInsets.only(bottom: 10),
+              padding: const EdgeInsets.only(bottom: 12),
               child: _SkillRow(skill: skill),
             ),
           ),

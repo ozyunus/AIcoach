@@ -22,21 +22,47 @@ class ProfileScreen extends ConsumerWidget {
       title: 'Profile',
       children: [
         _ProfileHeader(user: user),
+        Row(
+          children: [
+            Expanded(
+              child: AppMetricTile(
+                value: '${user.writingHealthScore}',
+                label: 'Health',
+                accent: context.colors.primary,
+              ),
+            ),
+            const SizedBox(width: 10),
+            Expanded(
+              child: AppMetricTile(
+                value: '${state.essays.length}',
+                label: 'Essays',
+              ),
+            ),
+            const SizedBox(width: 10),
+            Expanded(
+              child: AppMetricTile(
+                value: '${user.currentStreak}',
+                label: 'Streak',
+                accent: context.colors.warn,
+              ),
+            ),
+          ],
+        ),
         const AppSectionHeader(title: 'Exam target'),
         DesignCard(
           child: Column(
             children: [
               _ExamOption(
-                title: 'IELTS Writing',
+                title: 'IELTS Academic',
                 subtitle: 'Band target ${ExamType.ielts.goalLabel}',
                 selected: user.examType == ExamType.ielts,
                 onTap: () => ref
                     .read(writingCoachProvider.notifier)
                     .selectExam(ExamType.ielts),
               ),
-              Divider(height: 24, color: context.colors.line2),
+              Divider(height: 24, color: context.colors.line),
               _ExamOption(
-                title: 'TOEFL Writing',
+                title: 'TOEFL iBT',
                 subtitle: 'Score target ${ExamType.toefl.goalLabel}',
                 selected: user.examType == ExamType.toefl,
                 onTap: () => ref
@@ -48,23 +74,32 @@ class ProfileScreen extends ConsumerWidget {
         ),
         const AppSectionHeader(title: 'Account'),
         DesignCard(
+          padding: EdgeInsets.zero,
           child: Column(
             children: [
-              _InfoRow(label: 'Email', value: user.email),
-              const SizedBox(height: 12),
-              _InfoRow(label: 'Plan', value: 'Free MVP'),
-              const SizedBox(height: 12),
-              _InfoRow(label: 'Credits', value: '${user.credits} remaining'),
-              const SizedBox(height: 18),
-              SizedBox(
-                width: double.infinity,
-                child: OutlinedButton.icon(
-                  key: const ValueKey('sign-out'),
-                  onPressed: () =>
-                      ref.read(writingCoachProvider.notifier).signOut(),
-                  icon: const Icon(Icons.logout_rounded),
-                  label: const Text('Sign out'),
-                ),
+              _SettingsRow(
+                icon: Icons.bolt_rounded,
+                label: 'Credit balance',
+                detail: '${user.credits} remaining',
+              ),
+              Divider(height: 1, indent: 62, color: context.colors.line),
+              _SettingsRow(
+                icon: Icons.email_outlined,
+                label: 'Email',
+                detail: user.email,
+              ),
+              Divider(height: 1, indent: 62, color: context.colors.line),
+              _SettingsRow(
+                icon: Icons.notifications_none_rounded,
+                label: 'Reminders',
+                detail: 'Daily 9:00',
+              ),
+              Divider(height: 1, indent: 62, color: context.colors.line),
+              _SettingsRow(
+                icon: Icons.logout_rounded,
+                label: 'Sign out',
+                danger: true,
+                onTap: () => ref.read(writingCoachProvider.notifier).signOut(),
               ),
             ],
           ),
@@ -83,15 +118,19 @@ class _ProfileHeader extends StatelessWidget {
   Widget build(BuildContext context) {
     final colors = context.colors;
 
-    return DesignCard(
+    return GradientCard(
       child: Row(
         children: [
           Container(
-            width: 62,
-            height: 62,
+            width: 64,
+            height: 64,
             decoration: BoxDecoration(
-              color: colors.primary,
-              borderRadius: BorderRadius.circular(20),
+              borderRadius: BorderRadius.circular(21),
+              gradient: LinearGradient(
+                begin: Alignment.topLeft,
+                end: Alignment.bottomRight,
+                colors: [colors.primaryTintStrong, colors.primary],
+              ),
             ),
             child: Center(
               child: Text(
@@ -103,7 +142,7 @@ class _ProfileHeader extends StatelessWidget {
               ),
             ),
           ),
-          const SizedBox(width: 14),
+          const SizedBox(width: 15),
           Expanded(
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.start,
@@ -117,13 +156,14 @@ class _ProfileHeader extends StatelessWidget {
                     fontWeight: FontWeight.w900,
                   ),
                 ),
-                const SizedBox(height: 5),
-                Text(
-                  '${user.examType.label} candidate · ${user.currentStreak} day streak',
-                  style: Theme.of(context).textTheme.bodyMedium?.copyWith(
-                    color: colors.ink2,
-                    fontWeight: FontWeight.w700,
-                  ),
+                const SizedBox(height: 6),
+                Wrap(
+                  spacing: 6,
+                  runSpacing: 6,
+                  children: [
+                    AppPill(label: '${user.examType.label} Academic'),
+                    AppPill(label: 'Target ${user.examType.goalLabel}'),
+                  ],
                 ),
               ],
             ),
@@ -154,73 +194,102 @@ class _ExamOption extends StatelessWidget {
     return InkWell(
       borderRadius: AppSpacing.mediumRadius,
       onTap: onTap,
-      child: Row(
-        children: [
-          Icon(
-            selected ? Icons.radio_button_checked : Icons.radio_button_off,
-            color: selected ? colors.primary : colors.ink4,
-          ),
-          const SizedBox(width: 12),
-          Expanded(
-            child: Column(
-              crossAxisAlignment: CrossAxisAlignment.start,
-              children: [
-                Text(
-                  title,
-                  style: Theme.of(context).textTheme.titleSmall?.copyWith(
-                    color: colors.ink,
-                    fontWeight: FontWeight.w900,
-                  ),
-                ),
-                const SizedBox(height: 3),
-                Text(
-                  subtitle,
-                  style: Theme.of(context).textTheme.bodySmall?.copyWith(
-                    color: colors.ink2,
-                    fontWeight: FontWeight.w700,
-                  ),
-                ),
-              ],
+      child: Padding(
+        padding: const EdgeInsets.symmetric(vertical: 4),
+        child: Row(
+          children: [
+            Icon(
+              selected ? Icons.radio_button_checked : Icons.radio_button_off,
+              color: selected ? colors.primary : colors.ink4,
             ),
-          ),
-        ],
+            const SizedBox(width: 12),
+            Expanded(
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  Text(
+                    title,
+                    style: Theme.of(context).textTheme.titleSmall?.copyWith(
+                      color: colors.ink,
+                      fontWeight: FontWeight.w900,
+                    ),
+                  ),
+                  const SizedBox(height: 3),
+                  Text(
+                    subtitle,
+                    style: Theme.of(context).textTheme.bodySmall?.copyWith(
+                      color: colors.ink2,
+                      fontWeight: FontWeight.w700,
+                    ),
+                  ),
+                ],
+              ),
+            ),
+          ],
+        ),
       ),
     );
   }
 }
 
-class _InfoRow extends StatelessWidget {
-  const _InfoRow({required this.label, required this.value});
+class _SettingsRow extends StatelessWidget {
+  const _SettingsRow({
+    required this.icon,
+    required this.label,
+    this.detail,
+    this.danger = false,
+    this.onTap,
+  });
 
+  final IconData icon;
   final String label;
-  final String value;
+  final String? detail;
+  final bool danger;
+  final VoidCallback? onTap;
 
   @override
   Widget build(BuildContext context) {
     final colors = context.colors;
+    final accent = danger ? colors.bad : colors.ink3;
 
-    return Row(
-      children: [
-        Text(
-          label,
-          style: Theme.of(context).textTheme.bodyMedium?.copyWith(
-            color: colors.ink2,
-            fontWeight: FontWeight.w700,
-          ),
-        ),
-        const Spacer(),
-        Flexible(
-          child: Text(
-            value,
-            textAlign: TextAlign.right,
-            overflow: TextOverflow.ellipsis,
-            style: Theme.of(context).textTheme.bodyMedium?.copyWith(
-              color: colors.ink,
-              fontWeight: FontWeight.w900,
+    return InkWell(
+      onTap: onTap,
+      child: Padding(
+        padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 14),
+        child: Row(
+          children: [
+            IconBadge(
+              icon: icon,
+              size: 32,
+              backgroundColor: danger ? colors.badTint : colors.sunken,
+              foregroundColor: accent,
             ),
-          ),
+            const SizedBox(width: 13),
+            Expanded(
+              child: Text(
+                label,
+                style: Theme.of(context).textTheme.bodyMedium?.copyWith(
+                  color: danger ? colors.bad : colors.ink,
+                  fontWeight: FontWeight.w900,
+                ),
+              ),
+            ),
+            if (detail != null)
+              Flexible(
+                child: Text(
+                  detail!,
+                  textAlign: TextAlign.right,
+                  overflow: TextOverflow.ellipsis,
+                  style: Theme.of(context).textTheme.bodySmall?.copyWith(
+                    color: colors.ink3,
+                    fontWeight: FontWeight.w700,
+                  ),
+                ),
+              ),
+            if (!danger) Icon(Icons.chevron_right_rounded, color: colors.ink4),
+          ],
         ),
-      ],
+      ),
     );
   }
 }

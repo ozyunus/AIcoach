@@ -1,0 +1,1945 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Writing Coach UI Preview</title>
+  <style>
+    :root {
+      color-scheme: dark;
+      --stage: #090a0f;
+      --phone: #06070a;
+      --bg: #0a0b10;
+      --bg-2: #101219;
+      --card: #151722;
+      --card-2: #191c29;
+      --card-3: #10131b;
+      --line: rgba(255, 255, 255, .075);
+      --line-strong: rgba(255, 255, 255, .13);
+      --ink: #f7f8fb;
+      --ink-2: #d4d8e4;
+      --muted: #8b91a3;
+      --muted-2: #5f6575;
+      --primary: #696fff;
+      --primary-2: #9aa3ff;
+      --primary-soft: rgba(105, 111, 255, .14);
+      --good: #34d399;
+      --good-soft: rgba(52, 211, 153, .12);
+      --warn: #fbbf24;
+      --warn-soft: rgba(251, 191, 36, .12);
+      --bad: #fb7185;
+      --bad-soft: rgba(251, 113, 133, .12);
+      --violet: #c084fc;
+      --violet-soft: rgba(192, 132, 252, .13);
+      --shadow-pop: 0 26px 70px -32px rgba(105, 111, 255, .55);
+      --shadow-soft: 0 18px 42px -30px rgba(0, 0, 0, .9);
+      --radius-xl: 26px;
+      --radius-lg: 20px;
+      --radius-md: 16px;
+      --tab-h: 92px;
+      font-family: Inter, ui-sans-serif, system-ui, -apple-system, BlinkMacSystemFont, "SF Pro Display", "Segoe UI", sans-serif;
+    }
+
+    body[data-theme="day"] {
+      color-scheme: light;
+      --phone: #f6f8ff;
+      --bg: #f5f7ff;
+      --bg-2: #edf1fb;
+      --card: #ffffff;
+      --card-2: #f8faff;
+      --card-3: #eef3ff;
+      --line: rgba(29, 42, 72, .12);
+      --line-strong: rgba(29, 42, 72, .2);
+      --ink: #101828;
+      --ink-2: #334155;
+      --muted: #667085;
+      --muted-2: #98a2b3;
+      --primary: #4551e6;
+      --primary-2: #4f5dff;
+      --primary-soft: rgba(79, 93, 255, .11);
+      --good: #059669;
+      --good-soft: rgba(5, 150, 105, .1);
+      --warn: #b7791f;
+      --warn-soft: rgba(183, 121, 31, .12);
+      --bad: #dc2626;
+      --bad-soft: rgba(220, 38, 38, .1);
+      --violet: #7c3aed;
+      --violet-soft: rgba(124, 58, 237, .1);
+      --shadow-pop: 0 24px 54px -34px rgba(69, 81, 230, .45);
+      --shadow-soft: 0 18px 38px -32px rgba(29, 42, 72, .38);
+    }
+
+    body[data-theme="a11y"] {
+      color-scheme: dark;
+      --phone: #000000;
+      --bg: #000000;
+      --bg-2: #0b0b0b;
+      --card: #111111;
+      --card-2: #151515;
+      --card-3: #0b0b0b;
+      --line: rgba(255, 255, 255, .26);
+      --line-strong: rgba(255, 255, 255, .42);
+      --ink: #ffffff;
+      --ink-2: #f2f4f7;
+      --muted: #d0d5dd;
+      --muted-2: #b8c0cc;
+      --primary: #38bdf8;
+      --primary-2: #7dd3fc;
+      --primary-soft: rgba(56, 189, 248, .18);
+      --good: #4ade80;
+      --good-soft: rgba(74, 222, 128, .17);
+      --warn: #facc15;
+      --warn-soft: rgba(250, 204, 21, .18);
+      --bad: #fb7185;
+      --bad-soft: rgba(251, 113, 133, .18);
+      --violet: #d8b4fe;
+      --violet-soft: rgba(216, 180, 254, .17);
+      --shadow-pop: none;
+      --shadow-soft: none;
+      --tab-h: 100px;
+    }
+
+    * {
+      box-sizing: border-box;
+    }
+
+    body {
+      margin: 0;
+      min-height: 100vh;
+      display: grid;
+      place-items: center;
+      background:
+        radial-gradient(circle at 18% 0%, rgba(105, 111, 255, .26), transparent 30%),
+        radial-gradient(circle at 84% 14%, rgba(52, 211, 153, .14), transparent 28%),
+        linear-gradient(135deg, #050608, #11131c 52%, #07080c);
+      color: var(--ink);
+      -webkit-font-smoothing: antialiased;
+    }
+
+    body[data-theme="day"] {
+      background:
+        radial-gradient(circle at 18% 0%, rgba(79, 93, 255, .16), transparent 32%),
+        radial-gradient(circle at 84% 14%, rgba(5, 150, 105, .11), transparent 30%),
+        linear-gradient(135deg, #eef3ff, #fbfcff 54%, #e9eefb);
+    }
+
+    body[data-theme="a11y"] {
+      background: #000;
+    }
+
+    button,
+    textarea {
+      font: inherit;
+    }
+
+    button {
+      cursor: pointer;
+    }
+
+    button:focus-visible,
+    textarea:focus-visible {
+      outline: 3px solid var(--warn);
+      outline-offset: 3px;
+    }
+
+    .stage {
+      width: min(100vw, 1180px);
+      min-height: 100vh;
+      display: grid;
+      grid-template-columns: minmax(0, 1fr) 402px minmax(0, 1fr);
+      align-items: center;
+      gap: 34px;
+      padding: 28px;
+    }
+
+    .side {
+      max-width: 310px;
+      color: var(--muted);
+    }
+
+    .side h1 {
+      margin: 0 0 12px;
+      color: var(--ink);
+      font-size: 34px;
+      line-height: 1.05;
+      letter-spacing: -.04em;
+    }
+
+    .side p {
+      margin: 0;
+      font-size: 14px;
+      line-height: 1.6;
+    }
+
+    .side-card {
+      margin-top: 20px;
+      padding: 16px;
+      border: 1px solid var(--line);
+      border-radius: 20px;
+      background: rgba(15, 18, 27, .62);
+      backdrop-filter: blur(18px);
+    }
+
+    .side-card b {
+      display: block;
+      margin-bottom: 8px;
+      color: var(--ink-2);
+      font-size: 13px;
+      letter-spacing: .08em;
+      text-transform: uppercase;
+    }
+
+    .theme-switch {
+      display: grid;
+      grid-template-columns: repeat(3, 1fr);
+      gap: 7px;
+      margin-top: 12px;
+    }
+
+    .theme-switch button {
+      min-height: 38px;
+      border: 1px solid var(--line);
+      border-radius: 13px;
+      background: rgba(255, 255, 255, .045);
+      color: var(--muted);
+      font-size: 12px;
+      font-weight: 800;
+    }
+
+    .theme-switch button.active {
+      border-color: var(--primary);
+      background: var(--primary-soft);
+      color: var(--primary-2);
+    }
+
+    #themeNote {
+      margin-top: 12px;
+      min-height: 44px;
+    }
+
+    body[data-theme="day"] .side-card,
+    body[data-theme="day"] .theme-switch button {
+      background: rgba(255, 255, 255, .76);
+    }
+
+    .phone {
+      width: 402px;
+      height: 874px;
+      position: relative;
+      overflow: hidden;
+      border-radius: 48px;
+      background: var(--phone);
+      box-shadow:
+        0 44px 100px rgba(0, 0, 0, .48),
+        0 0 0 1px rgba(255, 255, 255, .08),
+        inset 0 0 0 1px rgba(255, 255, 255, .05);
+    }
+
+    .phone::before {
+      content: "";
+      position: absolute;
+      top: 12px;
+      left: 50%;
+      width: 126px;
+      height: 36px;
+      z-index: 20;
+      border-radius: 999px;
+      background: #000;
+      transform: translateX(-50%);
+    }
+
+    body[data-theme="day"] .phone {
+      box-shadow:
+        0 44px 100px rgba(15, 23, 42, .22),
+        0 0 0 1px rgba(15, 23, 42, .1),
+        inset 0 0 0 1px rgba(255, 255, 255, .8);
+    }
+
+    body[data-theme="a11y"] .phone {
+      box-shadow:
+        0 0 0 2px #fff,
+        0 0 0 8px #000;
+    }
+
+    .app {
+      position: absolute;
+      inset: 0;
+      overflow: hidden;
+      background:
+        radial-gradient(circle at 50% -12%, rgba(105, 111, 255, .23), transparent 34%),
+        linear-gradient(180deg, #0e1018 0%, var(--bg) 36%, #08090d 100%);
+    }
+
+    body[data-theme="day"] .app {
+      background:
+        radial-gradient(circle at 50% -12%, rgba(79, 93, 255, .15), transparent 36%),
+        linear-gradient(180deg, #ffffff 0%, var(--bg) 38%, #eef3ff 100%);
+    }
+
+    body[data-theme="a11y"] .app {
+      background: #000;
+    }
+
+    .status {
+      position: absolute;
+      top: 0;
+      left: 0;
+      right: 0;
+      height: 58px;
+      z-index: 15;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      padding: 16px 27px 0;
+      color: var(--ink);
+      font-size: 15px;
+      font-weight: 750;
+    }
+
+    .status-icons {
+      display: flex;
+      align-items: center;
+      gap: 7px;
+    }
+
+    .signal {
+      display: flex;
+      align-items: flex-end;
+      gap: 2px;
+      height: 12px;
+    }
+
+    .signal i {
+      display: block;
+      width: 3px;
+      border-radius: 1px;
+      background: var(--ink);
+    }
+
+    body[data-theme="day"] .battery {
+      border-color: rgba(16, 24, 40, .62);
+    }
+
+    body[data-theme="day"] .battery::after {
+      background: rgba(16, 24, 40, .62);
+    }
+
+    .signal i:nth-child(1) { height: 5px; }
+    .signal i:nth-child(2) { height: 7px; }
+    .signal i:nth-child(3) { height: 9px; }
+    .signal i:nth-child(4) { height: 12px; }
+
+    .battery {
+      width: 25px;
+      height: 12px;
+      position: relative;
+      border: 1.4px solid rgba(255, 255, 255, .72);
+      border-radius: 4px;
+      padding: 2px;
+    }
+
+    .battery::before {
+      content: "";
+      display: block;
+      height: 100%;
+      width: 72%;
+      border-radius: 2px;
+      background: var(--ink);
+    }
+
+    .battery::after {
+      content: "";
+      position: absolute;
+      top: 3px;
+      right: -4px;
+      width: 2px;
+      height: 5px;
+      border-radius: 2px;
+      background: rgba(255, 255, 255, .62);
+    }
+
+    .screen {
+      position: absolute;
+      inset: 0;
+      overflow-y: auto;
+      overflow-x: hidden;
+      padding: 64px 20px calc(var(--tab-h) + 28px);
+      opacity: 0;
+      pointer-events: none;
+      transform: translateX(16px);
+      transition: opacity .22s ease, transform .22s ease;
+      scrollbar-width: none;
+    }
+
+    .screen::-webkit-scrollbar {
+      width: 0;
+      height: 0;
+    }
+
+    .screen.active {
+      opacity: 1;
+      pointer-events: auto;
+      transform: translateX(0);
+    }
+
+    .appbar {
+      display: flex;
+      align-items: flex-start;
+      justify-content: space-between;
+      gap: 14px;
+      margin-bottom: 20px;
+    }
+
+    .kicker {
+      margin: 0 0 5px;
+      color: var(--muted);
+      font-size: 13px;
+      font-weight: 650;
+    }
+
+    .title {
+      margin: 0;
+      color: var(--ink);
+      font-size: 28px;
+      line-height: 1.04;
+      font-weight: 850;
+      letter-spacing: -.035em;
+    }
+
+    .subtitle {
+      margin: 4px 0 0;
+      color: var(--muted);
+      font-size: 13px;
+      line-height: 1.35;
+    }
+
+    .row {
+      display: flex;
+      align-items: center;
+    }
+
+    .between {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 14px;
+    }
+
+    .stack {
+      display: grid;
+      gap: 12px;
+    }
+
+    .grid-2 {
+      display: grid;
+      grid-template-columns: repeat(2, minmax(0, 1fr));
+      gap: 12px;
+    }
+
+    .grid-3 {
+      display: grid;
+      grid-template-columns: repeat(3, minmax(0, 1fr));
+      gap: 10px;
+    }
+
+    .card {
+      border: 1px solid var(--line);
+      border-radius: var(--radius-xl);
+      background:
+        linear-gradient(180deg, rgba(255, 255, 255, .035), transparent 42%),
+        var(--card);
+      box-shadow: var(--shadow-soft);
+    }
+
+    body[data-theme="day"] .card {
+      background:
+        linear-gradient(180deg, rgba(79, 93, 255, .035), transparent 48%),
+        var(--card);
+    }
+
+    body[data-theme="a11y"] .card,
+    body[data-theme="a11y"] .hero,
+    body[data-theme="a11y"] .challenge,
+    body[data-theme="a11y"] .essay-card,
+    body[data-theme="a11y"] .stat,
+    body[data-theme="a11y"] .prompt,
+    body[data-theme="a11y"] .editor,
+    body[data-theme="a11y"] .correction,
+    body[data-theme="a11y"] .metric-card,
+    body[data-theme="a11y"] .plan-row,
+    body[data-theme="a11y"] .tabbar-inner {
+      border-width: 2px;
+    }
+
+    .card-pad {
+      padding: 18px;
+    }
+
+    .hero {
+      position: relative;
+      overflow: hidden;
+      padding: 21px;
+      border-radius: 28px;
+      background:
+        radial-gradient(circle at 84% 6%, rgba(154, 163, 255, .25), transparent 32%),
+        linear-gradient(155deg, #1b1f31 0%, #11131d 52%, #0c0d13 100%);
+      border: 1px solid rgba(154, 163, 255, .18);
+      box-shadow: var(--shadow-pop);
+    }
+
+    body[data-theme="day"] .hero {
+      background:
+        radial-gradient(circle at 84% 6%, rgba(79, 93, 255, .17), transparent 34%),
+        linear-gradient(155deg, #ffffff 0%, #f2f5ff 52%, #e8edff 100%);
+      border-color: rgba(79, 93, 255, .18);
+    }
+
+    body[data-theme="a11y"] .hero {
+      background: #0b0b0b;
+      border-color: var(--line-strong);
+    }
+
+    .hero::after {
+      content: "";
+      position: absolute;
+      inset: 0;
+      pointer-events: none;
+      background: linear-gradient(135deg, rgba(255,255,255,.09), transparent 28%);
+      opacity: .48;
+    }
+
+    body[data-theme="day"] .hero::after,
+    body[data-theme="a11y"] .hero::after {
+      display: none;
+    }
+
+    .hero > * {
+      position: relative;
+      z-index: 1;
+    }
+
+    .mono {
+      font-family: "SF Mono", "JetBrains Mono", ui-monospace, Menlo, Consolas, monospace;
+      font-variant-numeric: tabular-nums;
+      letter-spacing: -.03em;
+    }
+
+    .eyebrow {
+      color: var(--muted-2);
+      font-size: 11px;
+      font-weight: 750;
+      letter-spacing: .09em;
+      text-transform: uppercase;
+    }
+
+    .chip {
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+      height: 30px;
+      padding: 0 10px;
+      border: 1px solid transparent;
+      border-radius: 999px;
+      background: rgba(255, 255, 255, .05);
+      color: var(--ink-2);
+      font-size: 12px;
+      font-weight: 700;
+      white-space: nowrap;
+    }
+
+    body[data-theme="day"] .chip {
+      background: rgba(16, 24, 40, .055);
+      border-color: rgba(16, 24, 40, .05);
+    }
+
+    .chip-primary {
+      border-color: rgba(154, 163, 255, .2);
+      background: var(--primary-soft);
+      color: var(--primary-2);
+    }
+
+    .chip-good {
+      border-color: rgba(52, 211, 153, .18);
+      background: var(--good-soft);
+      color: var(--good);
+    }
+
+    .chip-warn {
+      border-color: rgba(251, 191, 36, .18);
+      background: var(--warn-soft);
+      color: var(--warn);
+    }
+
+    .button {
+      height: 54px;
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      gap: 9px;
+      border: 0;
+      border-radius: 17px;
+      padding: 0 18px;
+      color: #fff;
+      background: linear-gradient(135deg, var(--primary), #7f86ff);
+      box-shadow: 0 16px 34px -14px rgba(105, 111, 255, .9);
+      font-size: 15px;
+      font-weight: 800;
+      letter-spacing: -.01em;
+    }
+
+    .button.soft {
+      border: 1px solid var(--line);
+      color: var(--ink);
+      background: rgba(255, 255, 255, .055);
+      box-shadow: none;
+    }
+
+    body[data-theme="day"] .button.soft,
+    body[data-theme="day"] .icon-btn {
+      background: rgba(16, 24, 40, .045);
+    }
+
+    body[data-theme="a11y"] .button {
+      min-height: 58px;
+      font-size: 16px;
+      box-shadow: none;
+    }
+
+    .button.block {
+      width: 100%;
+    }
+
+    .icon-btn {
+      width: 42px;
+      height: 42px;
+      display: grid;
+      place-items: center;
+      border: 1px solid var(--line);
+      border-radius: 15px;
+      background: rgba(255, 255, 255, .055);
+      color: var(--ink-2);
+    }
+
+    .avatar {
+      width: 44px;
+      height: 44px;
+      display: grid;
+      place-items: center;
+      border-radius: 15px;
+      background: linear-gradient(135deg, #aab4ff, var(--primary));
+      color: #fff;
+      font-size: 17px;
+      font-weight: 850;
+      box-shadow: 0 12px 24px -16px rgba(154, 163, 255, .8);
+    }
+
+    .theme-cycle {
+      width: 42px;
+      height: 42px;
+      display: grid;
+      place-items: center;
+      border: 1px solid var(--line);
+      border-radius: 15px;
+      background: rgba(255, 255, 255, .055);
+      color: var(--primary-2);
+    }
+
+    .theme-cycle svg {
+      width: 22px;
+      height: 22px;
+    }
+
+    body[data-theme="day"] .theme-cycle {
+      background: rgba(16, 24, 40, .045);
+      color: var(--warn);
+    }
+
+    body[data-theme="a11y"] .theme-cycle {
+      border-width: 2px;
+      background: #050505;
+      color: var(--primary-2);
+    }
+
+    .score-row {
+      display: flex;
+      align-items: flex-end;
+      justify-content: space-between;
+      gap: 14px;
+      margin-top: 16px;
+    }
+
+    .score-big {
+      color: var(--ink);
+      font-size: 66px;
+      line-height: .88;
+      font-weight: 750;
+    }
+
+    .score-unit {
+      margin-left: 5px;
+      color: var(--muted-2);
+      font-size: 18px;
+      font-weight: 700;
+    }
+
+    .spark {
+      width: 128px;
+      height: 62px;
+    }
+
+    .bar {
+      height: 8px;
+      overflow: hidden;
+      border-radius: 999px;
+      background: rgba(255, 255, 255, .07);
+    }
+
+    body[data-theme="day"] .bar {
+      background: rgba(16, 24, 40, .09);
+    }
+
+    body[data-theme="a11y"] .bar {
+      height: 10px;
+      background: rgba(255, 255, 255, .18);
+    }
+
+    .bar span {
+      display: block;
+      height: 100%;
+      width: var(--v);
+      border-radius: inherit;
+      background: var(--c, var(--primary));
+    }
+
+    .section-head {
+      display: flex;
+      align-items: baseline;
+      justify-content: space-between;
+      margin: 24px 4px 12px;
+    }
+
+    .section-head h2 {
+      margin: 0;
+      color: var(--ink);
+      font-size: 17px;
+      font-weight: 800;
+      letter-spacing: -.02em;
+    }
+
+    .section-head button {
+      border: 0;
+      background: transparent;
+      color: var(--primary-2);
+      font-size: 13px;
+      font-weight: 750;
+    }
+
+    .goal {
+      border: 1px solid rgba(105, 111, 255, .22);
+      background:
+        radial-gradient(circle at 96% 0%, rgba(154, 163, 255, .22), transparent 34%),
+        linear-gradient(150deg, rgba(105, 111, 255, .23), rgba(16, 18, 27, .94) 58%);
+    }
+
+    body[data-theme="day"] .goal {
+      background:
+        radial-gradient(circle at 96% 0%, rgba(79, 93, 255, .12), transparent 36%),
+        linear-gradient(150deg, rgba(79, 93, 255, .11), #ffffff 62%);
+      border-color: rgba(79, 93, 255, .16);
+    }
+
+    body[data-theme="a11y"] .goal {
+      background: #111;
+      border-color: var(--line-strong);
+    }
+
+    .goal h3 {
+      margin: 10px 0 6px;
+      color: var(--ink);
+      font-size: 19px;
+      line-height: 1.2;
+      font-weight: 850;
+      letter-spacing: -.02em;
+    }
+
+    .goal p,
+    .body {
+      margin: 0;
+      color: var(--muted);
+      font-size: 13.5px;
+      line-height: 1.55;
+    }
+
+    .challenge-strip {
+      display: flex;
+      gap: 12px;
+      overflow-x: auto;
+      margin: 0 -20px;
+      padding: 2px 20px 4px;
+      scrollbar-width: none;
+    }
+
+    .challenge {
+      width: 176px;
+      min-width: 176px;
+      padding: 15px;
+      border-radius: 20px;
+      border: 1px solid var(--line);
+      background: var(--card);
+    }
+
+    body[data-theme="day"] .challenge,
+    body[data-theme="day"] .essay-card,
+    body[data-theme="day"] .stat,
+    body[data-theme="day"] .correction,
+    body[data-theme="day"] .metric-card,
+    body[data-theme="day"] .plan-row {
+      background: #fff;
+    }
+
+    .badge-icon {
+      width: 36px;
+      height: 36px;
+      display: grid;
+      place-items: center;
+      border-radius: 13px;
+      background: var(--soft);
+      color: var(--color);
+    }
+
+    .mini-title {
+      margin: 12px 0 10px;
+      color: var(--ink);
+      font-size: 14px;
+      line-height: 1.25;
+      font-weight: 800;
+    }
+
+    .essay-card {
+      display: flex;
+      align-items: center;
+      gap: 13px;
+      width: 100%;
+      padding: 15px;
+      text-align: left;
+      border: 1px solid var(--line);
+      border-radius: 20px;
+      background: var(--card);
+      color: inherit;
+    }
+
+    .essay-band {
+      width: 50px;
+      height: 50px;
+      display: grid;
+      place-items: center;
+      border-radius: 16px;
+      background: var(--primary-soft);
+      color: var(--primary-2);
+      font-size: 16px;
+      font-weight: 750;
+    }
+
+    .essay-card h3 {
+      margin: 0;
+      color: var(--ink);
+      font-size: 14.5px;
+      font-weight: 800;
+      white-space: nowrap;
+      overflow: hidden;
+      text-overflow: ellipsis;
+    }
+
+    .essay-card p {
+      margin: 3px 0 0;
+      color: var(--muted);
+      font-size: 12px;
+    }
+
+    .stat {
+      padding: 15px 10px;
+      text-align: center;
+      border: 1px solid var(--line);
+      border-radius: 18px;
+      background: var(--card);
+    }
+
+    .stat strong {
+      display: block;
+      color: var(--ink);
+      font-size: 24px;
+      line-height: 1;
+      font-weight: 750;
+    }
+
+    .stat span {
+      display: block;
+      margin-top: 5px;
+      color: var(--muted);
+      font-size: 11.5px;
+      font-weight: 650;
+    }
+
+    .prompt {
+      padding: 16px;
+      border: 1px solid var(--line);
+      border-radius: 20px;
+      background: rgba(255, 255, 255, .045);
+    }
+
+    .prompt p {
+      margin: 10px 0 0;
+      color: var(--ink-2);
+      font-size: 14.5px;
+      line-height: 1.5;
+      font-weight: 650;
+    }
+
+    body[data-theme="day"] .prompt {
+      background: rgba(255, 255, 255, .82);
+    }
+
+    .editor {
+      overflow: hidden;
+      border: 1px solid var(--line);
+      border-radius: 24px;
+      background: #11131a;
+    }
+
+    body[data-theme="day"] .editor {
+      background: #fff;
+    }
+
+    body[data-theme="a11y"] .editor {
+      background: #050505;
+    }
+
+    textarea {
+      width: 100%;
+      min-height: 250px;
+      display: block;
+      resize: none;
+      border: 0;
+      outline: 0;
+      padding: 18px;
+      background: transparent;
+      color: var(--ink);
+      font-size: 15px;
+      line-height: 1.62;
+    }
+
+    textarea::placeholder {
+      color: var(--muted-2);
+    }
+
+    .editor-foot {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 12px;
+      padding: 13px 16px;
+      border-top: 1px solid var(--line);
+      background: rgba(255, 255, 255, .03);
+    }
+
+    body[data-theme="day"] .editor-foot {
+      background: rgba(16, 24, 40, .035);
+    }
+
+    .sticky-cta {
+      position: sticky;
+      bottom: 2px;
+      z-index: 5;
+      padding-top: 16px;
+      background: linear-gradient(transparent, var(--bg) 42%);
+    }
+
+    .ring {
+      --p: 78;
+      --size: 132px;
+      width: var(--size);
+      height: var(--size);
+      position: relative;
+      display: grid;
+      place-items: center;
+    }
+
+    .ring svg {
+      position: absolute;
+      inset: 0;
+      transform: rotate(-90deg);
+    }
+
+    .ring .track {
+      stroke: rgba(255,255,255,.075);
+    }
+
+    body[data-theme="day"] .ring .track {
+      stroke: rgba(16, 24, 40, .1);
+    }
+
+    body[data-theme="a11y"] .ring .track {
+      stroke: rgba(255,255,255,.24);
+    }
+
+    .ring .value {
+      stroke: var(--c, var(--primary));
+      stroke-dasharray: 314;
+      stroke-dashoffset: calc(314 - (314 * var(--p) / 100));
+      stroke-linecap: round;
+    }
+
+    .ring-content {
+      position: relative;
+      z-index: 1;
+      text-align: center;
+    }
+
+    .ring-content strong {
+      display: block;
+      color: var(--ink);
+      font-size: 42px;
+      line-height: 1;
+      font-weight: 750;
+    }
+
+    .ring-content span {
+      display: block;
+      margin-top: 3px;
+      color: var(--muted-2);
+      font-size: 11px;
+      font-weight: 700;
+    }
+
+    .skill {
+      display: grid;
+      gap: 8px;
+    }
+
+    .skill-top {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 10px;
+      color: var(--ink-2);
+      font-size: 13.5px;
+      font-weight: 750;
+    }
+
+    .correction {
+      overflow: hidden;
+      border: 1px solid var(--line);
+      border-radius: 18px;
+      background: var(--card);
+    }
+
+    .correction summary {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+      padding: 15px;
+      list-style: none;
+      cursor: pointer;
+    }
+
+    .correction summary::-webkit-details-marker {
+      display: none;
+    }
+
+    .dot {
+      width: 9px;
+      height: 9px;
+      flex: none;
+      border-radius: 999px;
+      background: var(--c);
+      box-shadow: 0 0 0 5px var(--soft);
+    }
+
+    .correction-body {
+      display: grid;
+      gap: 10px;
+      padding: 0 15px 15px 36px;
+      color: var(--muted);
+      font-size: 13px;
+      line-height: 1.45;
+    }
+
+    .wrong {
+      color: var(--bad);
+      background: var(--bad-soft);
+      border-radius: 5px;
+      padding: 1px 3px;
+      text-decoration: line-through;
+    }
+
+    .right {
+      color: var(--good);
+      background: var(--good-soft);
+      border-radius: 5px;
+      padding: 1px 3px;
+      font-weight: 800;
+    }
+
+    .metric-card {
+      padding: 15px;
+      border: 1px solid var(--line);
+      border-radius: 18px;
+      background: var(--card);
+    }
+
+    .metric-card h3 {
+      margin: 0;
+      color: var(--muted);
+      font-size: 13px;
+      font-weight: 700;
+    }
+
+    .metric-card strong {
+      display: block;
+      margin-top: 9px;
+      color: var(--ink);
+      font-size: 21px;
+      font-weight: 750;
+    }
+
+    .coach-hero {
+      display: flex;
+      gap: 14px;
+      padding: 18px;
+      border-radius: 24px;
+      border: 1px solid rgba(52, 211, 153, .16);
+      background:
+        radial-gradient(circle at 96% 0%, rgba(52, 211, 153, .2), transparent 30%),
+        linear-gradient(145deg, #122018, #0d1110);
+    }
+
+    body[data-theme="day"] .coach-hero {
+      background:
+        radial-gradient(circle at 96% 0%, rgba(5, 150, 105, .12), transparent 30%),
+        linear-gradient(145deg, #ffffff, #eefdf6);
+      border-color: rgba(5, 150, 105, .16);
+    }
+
+    body[data-theme="a11y"] .coach-hero {
+      background: #08110c;
+      border-color: var(--line-strong);
+    }
+
+    .coach-mark {
+      width: 46px;
+      height: 46px;
+      display: grid;
+      place-items: center;
+      flex: none;
+      border-radius: 16px;
+      background: linear-gradient(135deg, #60f0ae, var(--good));
+      color: #07100b;
+      box-shadow: 0 14px 24px -16px rgba(52, 211, 153, .95);
+    }
+
+    .coach-hero h2 {
+      margin: 0 0 6px;
+      color: var(--ink);
+      font-size: 17px;
+      line-height: 1.25;
+      font-weight: 850;
+      letter-spacing: -.02em;
+    }
+
+    .plan-row {
+      display: flex;
+      align-items: center;
+      gap: 13px;
+      padding: 14px 15px;
+      border: 1px solid var(--line);
+      border-radius: 18px;
+      background: var(--card);
+    }
+
+    .day {
+      width: 44px;
+      height: 44px;
+      display: grid;
+      place-items: center;
+      flex: none;
+      border-radius: 14px;
+      background: var(--primary-soft);
+      color: var(--primary-2);
+      font-size: 12px;
+      font-weight: 850;
+    }
+
+    .tabbar {
+      position: absolute;
+      left: 0;
+      right: 0;
+      bottom: 0;
+      z-index: 12;
+      height: var(--tab-h);
+      padding: 9px 14px 26px;
+      background: linear-gradient(180deg, rgba(10,11,16,0), rgba(10,11,16,.94) 28%, #0a0b10 100%);
+    }
+
+    body[data-theme="day"] .tabbar {
+      background: linear-gradient(180deg, rgba(245,247,255,0), rgba(245,247,255,.94) 28%, #f5f7ff 100%);
+    }
+
+    body[data-theme="a11y"] .tabbar {
+      background: linear-gradient(180deg, rgba(0,0,0,0), rgba(0,0,0,.96) 24%, #000 100%);
+    }
+
+    .tabbar-inner {
+      height: 58px;
+      display: grid;
+      grid-template-columns: repeat(5, 1fr);
+      align-items: center;
+      border: 1px solid var(--line);
+      border-radius: 24px;
+      background: rgba(20, 23, 32, .9);
+      box-shadow: 0 12px 30px -22px #000;
+      backdrop-filter: blur(20px);
+    }
+
+    body[data-theme="day"] .tabbar-inner {
+      background: rgba(255, 255, 255, .92);
+      box-shadow: 0 16px 36px -30px rgba(16, 24, 40, .45);
+    }
+
+    body[data-theme="a11y"] .tabbar-inner {
+      height: 66px;
+      border-color: var(--line-strong);
+      background: #050505;
+      backdrop-filter: none;
+    }
+
+    .tab {
+      height: 100%;
+      display: grid;
+      place-items: center;
+      gap: 2px;
+      border: 0;
+      background: transparent;
+      color: var(--muted-2);
+      font-size: 10.5px;
+      font-weight: 750;
+    }
+
+    body[data-theme="a11y"] .tab {
+      font-size: 12px;
+      font-weight: 850;
+    }
+
+    .tab svg {
+      width: 22px;
+      height: 22px;
+    }
+
+    .tab.active {
+      color: var(--primary-2);
+    }
+
+    .tab[data-screen="write"].active svg,
+    .tab[data-screen="write"] svg {
+      width: 30px;
+      height: 30px;
+      padding: 7px;
+      border-radius: 13px;
+      background: linear-gradient(135deg, var(--primary), #858cff);
+      color: #fff;
+      box-shadow: 0 12px 22px -14px rgba(105, 111, 255, 1);
+    }
+
+    .home-indicator {
+      position: absolute;
+      left: 50%;
+      bottom: 8px;
+      z-index: 22;
+      width: 138px;
+      height: 5px;
+      border-radius: 999px;
+      background: rgba(255, 255, 255, .72);
+      transform: translateX(-50%);
+    }
+
+    body[data-theme="day"] .home-indicator {
+      background: rgba(16, 24, 40, .72);
+    }
+
+    body[data-theme="a11y"] .home-indicator {
+      background: #fff;
+    }
+
+    body[data-theme="a11y"] .screen {
+      padding-left: 22px;
+      padding-right: 22px;
+      transition: none;
+    }
+
+    body[data-theme="a11y"] .title {
+      font-size: 31px;
+      line-height: 1.1;
+      letter-spacing: 0;
+    }
+
+    body[data-theme="a11y"] .subtitle,
+    body[data-theme="a11y"] .body,
+    body[data-theme="a11y"] .goal p,
+    body[data-theme="a11y"] .prompt p,
+    body[data-theme="a11y"] .correction-body {
+      color: var(--muted);
+      font-size: 15px;
+      line-height: 1.65;
+    }
+
+    body[data-theme="a11y"] .eyebrow {
+      color: var(--muted);
+      font-size: 12px;
+    }
+
+    body[data-theme="a11y"] .chip {
+      height: 34px;
+      border-color: var(--line);
+      font-size: 13px;
+      font-weight: 850;
+    }
+
+    body[data-theme="a11y"] * {
+      animation: none !important;
+      transition-duration: 0.001ms !important;
+    }
+
+    @media (max-width: 900px) {
+      .stage {
+        display: grid;
+        grid-template-columns: 1fr;
+        justify-items: center;
+        padding: 12px;
+      }
+
+      .side {
+        display: none;
+      }
+    }
+
+    @media (max-width: 430px) {
+      body {
+        display: block;
+        background: var(--bg);
+      }
+
+      .stage {
+        min-height: 100vh;
+        padding: 0;
+      }
+
+      .phone {
+        width: 100vw;
+        height: 100vh;
+        border-radius: 0;
+        box-shadow: none;
+      }
+
+      .phone::before,
+      .home-indicator {
+        display: none;
+      }
+    }
+  </style>
+</head>
+<body>
+  <main class="stage">
+    <aside class="side">
+      <h1>Recommended UI direction</h1>
+      <p>This preview blends the current Writing Coach structure with the richer dark Claude concept: premium exam-prep feel, stronger score hierarchy, clearer correction cards, and a calmer bottom nav.</p>
+      <div class="side-card">
+        <b>Theme versions</b>
+        <div class="theme-switch" role="group" aria-label="Theme versions">
+          <button type="button" data-theme-choice="dark">Dark</button>
+          <button type="button" data-theme-choice="day">Day</button>
+          <button type="button" data-theme-choice="a11y">Accessible</button>
+        </div>
+        <p id="themeNote">Dark is the primary premium direction.</p>
+      </div>
+      <div class="side-card">
+        <b>Design DNA</b>
+        <p>Dark academic surface, indigo primary actions, green progress cues, compact cards, and IELTS/TOEFL content kept visible in the first screen.</p>
+      </div>
+      <div class="side-card">
+        <b>Before Flutter</b>
+        <p>Use the phone tabs to review Home, Write, Analysis, Progress, and Coach. If this direction feels right, I will translate it into Flutter components.</p>
+      </div>
+    </aside>
+
+    <section class="phone" aria-label="Writing Coach mobile preview">
+      <div class="app">
+        <div class="status">
+          <span>9:41</span>
+          <div class="status-icons" aria-hidden="true">
+            <span class="signal"><i></i><i></i><i></i><i></i></span>
+            <svg width="17" height="12" viewBox="0 0 17 12" fill="none">
+              <path d="M2 4.8c3.8-3.2 9.2-3.2 13 0" stroke="currentColor" stroke-width="1.6" stroke-linecap="round"/>
+              <path d="M5 7.4c2-1.5 5-1.5 7 0" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" opacity=".65"/>
+              <circle cx="8.5" cy="10" r="1.3" fill="currentColor"/>
+            </svg>
+            <span class="battery"></span>
+          </div>
+        </div>
+
+        <section class="screen active" data-panel="home">
+          <header class="appbar">
+            <div>
+              <p class="kicker">Good morning,</p>
+              <h1 class="title">Amara</h1>
+              <p class="subtitle">IELTS Academic - Target 7.5</p>
+            </div>
+            <div class="row" style="gap:8px">
+              <button class="chip chip-warn" data-go="profile" aria-label="Credits">
+                <svg width="14" height="14" viewBox="0 0 24 24" fill="currentColor"><path d="M13 2 4 14h6l-1 8 10-13h-6l0-7z"/></svg>
+                12
+              </button>
+              <button class="theme-cycle" type="button" data-theme-cycle aria-label="Switch theme"></button>
+              <button class="avatar" data-go="profile" aria-label="Profile">AO</button>
+            </div>
+          </header>
+
+          <article class="hero">
+            <div class="between">
+              <span class="eyebrow">Writing Health Score</span>
+              <span class="chip chip-good">
+                <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"><path d="M5 14l5-5 4 3 5-7"/></svg>
+                +7 this week
+              </span>
+            </div>
+            <div class="score-row">
+              <div>
+                <span class="score-big mono">78</span><span class="score-unit mono">/100</span>
+                <div style="margin-top:12px">
+                  <span class="chip chip-primary">Band 6.5 now</span>
+                  <span class="chip" style="margin-left:6px">7.5 goal</span>
+                </div>
+              </div>
+              <svg class="spark" viewBox="0 0 128 62" fill="none" aria-hidden="true">
+                <defs>
+                  <linearGradient id="sparkFill" x1="0" x2="0" y1="0" y2="1">
+                    <stop offset="0%" stop-color="#9aa3ff" stop-opacity=".34"/>
+                    <stop offset="100%" stop-color="#9aa3ff" stop-opacity="0"/>
+                  </linearGradient>
+                </defs>
+                <path d="M4 57 L4 44 C22 42 21 34 38 35 C52 36 56 24 72 26 C88 28 91 14 105 15 C116 16 118 9 124 7 L124 57 Z" fill="url(#sparkFill)"/>
+                <path d="M4 44 C22 42 21 34 38 35 C52 36 56 24 72 26 C88 28 91 14 105 15 C116 16 118 9 124 7" stroke="#9aa3ff" stroke-width="3" stroke-linecap="round"/>
+                <circle cx="124" cy="7" r="4" fill="#0d0f17" stroke="#9aa3ff" stroke-width="2.4"/>
+              </svg>
+            </div>
+            <div class="bar" style="margin-top:18px"><span style="--v:86%;--c:linear-gradient(90deg,#696fff,#34d399)"></span></div>
+          </article>
+
+          <article class="card card-pad goal" style="margin-top:14px">
+            <div class="between">
+              <span class="eyebrow">Today's Goal</span>
+              <span class="chip"><svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4"><circle cx="12" cy="12" r="9"/><path d="M12 7v5l3 2"/></svg>40 min</span>
+            </div>
+            <h3>Write 1 Task 2 essay</h3>
+            <p>Some people believe technology has made our lives too complex. To what extent do you agree?</p>
+            <button class="button block" style="margin-top:16px" data-go="write">
+              <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.3" stroke-linecap="round" stroke-linejoin="round"><path d="M4 20l1-4L16 5l3 3L8 19z"/><path d="M14 7l3 3"/></svg>
+              Start writing
+            </button>
+          </article>
+
+          <div class="section-head">
+            <h2>Active challenges</h2>
+            <button data-go="progress">See all</button>
+          </div>
+          <div class="challenge-strip">
+            <article class="challenge" style="--color:var(--warn);--soft:var(--warn-soft)">
+              <div class="between">
+                <div class="badge-icon">
+                  <svg width="19" height="19" viewBox="0 0 24 24" fill="currentColor"><path d="M13 2c.5 3-1.5 4.5-3 6.5C8.3 10.8 8 12.4 8 14a6 6 0 0 0 12 0c0-2-1-4-2.5-5.5.3 1.7-.6 2.8-1.7 3C16.2 8 15.5 4.5 13 2z"/></svg>
+                </div>
+                <span class="mono" style="color:var(--warn);font-size:13px;font-weight:750">3/5</span>
+              </div>
+              <h3 class="mini-title">5-Day Writing Streak</h3>
+              <div class="bar"><span style="--v:60%;--c:var(--warn)"></span></div>
+              <p class="subtitle">+3 credits</p>
+            </article>
+            <article class="challenge" style="--color:var(--good);--soft:var(--good-soft)">
+              <div class="between">
+                <div class="badge-icon">
+                  <svg width="19" height="19" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2"><circle cx="12" cy="12" r="8.5"/><circle cx="12" cy="12" r="4"/><circle cx="12" cy="12" r="1" fill="currentColor"/></svg>
+                </div>
+                <span class="mono" style="color:var(--good);font-size:13px;font-weight:750">8/14</span>
+              </div>
+              <h3 class="mini-title">Error Reduction</h3>
+              <div class="bar"><span style="--v:57%;--c:var(--good)"></span></div>
+              <p class="subtitle">+5 credits</p>
+            </article>
+            <article class="challenge" style="--color:var(--violet);--soft:var(--violet-soft)">
+              <div class="between">
+                <div class="badge-icon">
+                  <svg width="19" height="19" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.1"><path d="M4 5.5A2 2 0 0 1 6 4h6v15H6a2 2 0 0 0-2 1.5z"/><path d="M12 4h6a2 2 0 0 1 2 2v12.5a2 2 0 0 0-2-1.5h-6"/></svg>
+                </div>
+                <span class="mono" style="color:var(--violet);font-size:13px;font-weight:750">11/20</span>
+              </div>
+              <h3 class="mini-title">Vocabulary Upgrade</h3>
+              <div class="bar"><span style="--v:55%;--c:var(--violet)"></span></div>
+              <p class="subtitle">+5 credits</p>
+            </article>
+          </div>
+
+          <div class="section-head">
+            <h2>Last essay</h2>
+            <button data-go="analysis">Open</button>
+          </div>
+          <button class="essay-card" data-go="analysis">
+            <div class="essay-band mono">6.5</div>
+            <div style="min-width:0;flex:1">
+              <h3>Public transport and city design</h3>
+              <p>IELTS Task 2 - 284 words - 2 days ago</p>
+            </div>
+            <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.3" stroke-linecap="round"><path d="M9 5l7 7-7 7"/></svg>
+          </button>
+
+          <div class="section-head">
+            <h2>This month</h2>
+            <button data-go="progress">Details</button>
+          </div>
+          <div class="grid-3">
+            <div class="stat"><strong class="mono">12</strong><span>Essays</span></div>
+            <div class="stat"><strong class="mono" style="color:var(--good)">+7</strong><span>Health pts</span></div>
+            <div class="stat"><strong class="mono" style="color:var(--warn)">5</strong><span>Day streak</span></div>
+          </div>
+        </section>
+
+        <section class="screen" data-panel="write">
+          <header class="appbar">
+            <div>
+              <h1 class="title">Write</h1>
+              <p class="subtitle">Task 2 practice - 1 credit per analysis</p>
+            </div>
+            <button class="chip chip-warn">
+              <svg width="14" height="14" viewBox="0 0 24 24" fill="currentColor"><path d="M13 2 4 14h6l-1 8 10-13h-6l0-7z"/></svg>
+              12
+            </button>
+          </header>
+
+          <article class="prompt">
+            <div class="between">
+              <span class="chip chip-primary">IELTS Task 2</span>
+              <span class="chip">40 min</span>
+            </div>
+            <p>Some people believe technology has made our lives too complex. To what extent do you agree?</p>
+          </article>
+
+          <article class="editor" style="margin-top:14px">
+            <textarea id="essay" spellcheck="false">In recent years, public transport has become a central topic in city planning. Government should invest in public transport to reduce the traffic. This will make a big advantage for people who travel every day.
+
+Cars cause pollution, they should be limited in city centres. If cities build better trains and buses, more people will choose them over private vehicles.</textarea>
+            <div class="editor-foot">
+              <div>
+                <span class="mono" id="wordCount" style="font-size:15px;font-weight:750;color:var(--ink)">0</span>
+                <span style="color:var(--muted);font-size:13px"> / 250 words</span>
+              </div>
+              <div class="bar" style="width:118px"><span id="wordBar" style="--v:0%;--c:var(--primary)"></span></div>
+            </div>
+          </article>
+
+          <div class="section-head">
+            <h2>Writing tips</h2>
+          </div>
+          <div class="stack">
+            <div class="plan-row">
+              <div class="badge-icon" style="--soft:var(--primary-soft);--color:var(--primary-2)">
+                <svg width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.7"><path d="M5 12.5l4.5 4.5L19 6.5"/></svg>
+              </div>
+              <div><strong style="font-size:14px">State your position early</strong><p class="subtitle">The first paragraph should make your stance unmistakable.</p></div>
+            </div>
+            <div class="plan-row">
+              <div class="badge-icon" style="--soft:var(--good-soft);--color:var(--good)">
+                <svg width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.7"><path d="M5 12.5l4.5 4.5L19 6.5"/></svg>
+              </div>
+              <div><strong style="font-size:14px">Use one idea per paragraph</strong><p class="subtitle">Your structure is easier to score when each body paragraph has one job.</p></div>
+            </div>
+          </div>
+
+          <div class="sticky-cta">
+            <button class="button block" data-go="analysis">
+              <svg width="18" height="18" viewBox="0 0 24 24" fill="currentColor"><path d="M12 3l1.8 5.2L19 10l-5.2 1.8L12 17l-1.8-5.2L5 10l5.2-1.8z"/></svg>
+              Analyze essay
+              <span class="chip" style="height:24px;background:rgba(255,255,255,.18);color:#fff">1 credit</span>
+            </button>
+          </div>
+        </section>
+
+        <section class="screen" data-panel="analysis">
+          <header class="appbar">
+            <button class="icon-btn" data-go="home" aria-label="Back">
+              <svg width="19" height="19" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"><path d="M15 5l-7 7 7 7"/></svg>
+            </button>
+            <div style="flex:1">
+              <h1 class="title" style="font-size:22px">Essay analysis</h1>
+              <p class="subtitle">Public transport and city design</p>
+            </div>
+            <button class="icon-btn" aria-label="Refresh">
+              <svg width="19" height="19" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M20 11a8 8 0 0 0-14-4.5L4 8"/><path d="M4 4v4h4"/><path d="M4 13a8 8 0 0 0 14 4.5L20 16"/><path d="M20 20v-4h-4"/></svg>
+            </button>
+          </header>
+
+          <article class="hero" style="display:flex;align-items:center;gap:19px">
+            <div class="ring" style="--p:76;--c:var(--primary)">
+              <svg viewBox="0 0 120 120">
+                <circle class="track" cx="60" cy="60" r="50" fill="none" stroke-width="11"/>
+                <circle class="value" cx="60" cy="60" r="50" fill="none" stroke-width="11"/>
+              </svg>
+              <div class="ring-content"><strong class="mono">76</strong><span>/ 100</span></div>
+            </div>
+            <div style="flex:1">
+              <span class="eyebrow">Estimated band</span>
+              <div class="mono" style="margin-top:4px;color:var(--ink);font-size:50px;line-height:.95;font-weight:750">6.5</div>
+              <span class="chip chip-good" style="margin-top:12px">+0.5 from last</span>
+            </div>
+          </article>
+
+          <div class="section-head">
+            <h2>Skill breakdown</h2>
+          </div>
+          <div class="card card-pad stack">
+            <div class="skill">
+              <div class="skill-top"><span>Task Achievement</span><span class="mono">81</span></div>
+              <div class="bar"><span style="--v:81%;--c:var(--good)"></span></div>
+            </div>
+            <div class="skill">
+              <div class="skill-top"><span>Coherence & Cohesion</span><span class="mono">79</span></div>
+              <div class="bar"><span style="--v:79%;--c:var(--primary)"></span></div>
+            </div>
+            <div class="skill">
+              <div class="skill-top"><span>Lexical Resource <span class="chip chip-primary" style="height:22px;margin-left:5px">Focus</span></span><span class="mono">68</span></div>
+              <div class="bar"><span style="--v:68%;--c:var(--warn)"></span></div>
+            </div>
+            <div class="skill">
+              <div class="skill-top"><span>Grammar Range</span><span class="mono">84</span></div>
+              <div class="bar"><span style="--v:84%;--c:var(--good)"></span></div>
+            </div>
+          </div>
+
+          <div class="section-head">
+            <h2>Top corrections</h2>
+            <button>All</button>
+          </div>
+          <div class="stack">
+            <details class="correction" open>
+              <summary>
+                <span class="dot" style="--c:var(--bad);--soft:var(--bad-soft)"></span>
+                <div style="flex:1">
+                  <strong style="display:block;font-size:14.5px">Article usage</strong>
+                  <span class="subtitle">14 occurrences - frequent</span>
+                </div>
+                <span class="mono" style="color:var(--bad);font-size:13px">-3</span>
+              </summary>
+              <div class="correction-body">
+                <p>Government should invest in public transport to reduce <span class="wrong">the traffic</span>.</p>
+                <p><span class="right">The government</span> should invest in public transport to reduce traffic.</p>
+              </div>
+            </details>
+            <details class="correction">
+              <summary>
+                <span class="dot" style="--c:var(--warn);--soft:var(--warn-soft)"></span>
+                <div style="flex:1">
+                  <strong style="display:block;font-size:14.5px">Word choice & collocation</strong>
+                  <span class="subtitle">11 occurrences - frequent</span>
+                </div>
+                <span class="mono" style="color:var(--good);font-size:13px">-1</span>
+              </summary>
+              <div class="correction-body">
+                <p>This will <span class="wrong">make a big advantage</span> for people who travel every day.</p>
+                <p>This would <span class="right">offer a significant advantage</span> to daily commuters.</p>
+              </div>
+            </details>
+            <details class="correction">
+              <summary>
+                <span class="dot" style="--c:var(--primary);--soft:var(--primary-soft)"></span>
+                <div style="flex:1">
+                  <strong style="display:block;font-size:14.5px">Subject-verb agreement</strong>
+                  <span class="subtitle">8 occurrences - occasional</span>
+                </div>
+                <span class="mono" style="color:var(--good);font-size:13px">-4</span>
+              </summary>
+              <div class="correction-body">
+                <p>Technology <span class="wrong">have</span> changed communication.</p>
+                <p>Technology <span class="right">has</span> changed communication.</p>
+              </div>
+            </details>
+          </div>
+
+          <button class="button block" style="margin-top:18px" data-go="coach">See coach plan</button>
+        </section>
+
+        <section class="screen" data-panel="progress">
+          <header class="appbar">
+            <div>
+              <h1 class="title">Progress</h1>
+              <p class="subtitle">Last 8 weeks - IELTS Academic</p>
+            </div>
+            <span class="chip chip-primary">8 wks</span>
+          </header>
+
+          <article class="card card-pad">
+            <div class="between">
+              <div>
+                <span class="eyebrow">Writing Health Score</span>
+                <div class="mono" style="margin-top:5px;color:var(--ink);font-size:36px;font-weight:750">78 <span style="color:var(--good);font-size:14px">+14 pts</span></div>
+              </div>
+              <span class="chip chip-good">Steady climb</span>
+            </div>
+            <svg viewBox="0 0 330 142" width="100%" height="142" style="margin-top:12px" aria-hidden="true">
+              <defs>
+                <linearGradient id="progressFill" x1="0" x2="0" y1="0" y2="1">
+                  <stop offset="0%" stop-color="#696fff" stop-opacity=".3"/>
+                  <stop offset="100%" stop-color="#696fff" stop-opacity="0"/>
+                </linearGradient>
+              </defs>
+              <path d="M8 128 L8 98 C52 92 49 84 86 86 C125 88 121 68 164 72 C207 76 204 48 246 44 C286 40 290 26 322 18 L322 128 Z" fill="url(#progressFill)"/>
+              <path d="M8 98 C52 92 49 84 86 86 C125 88 121 68 164 72 C207 76 204 48 246 44 C286 40 290 26 322 18" fill="none" stroke="#9aa3ff" stroke-width="3" stroke-linecap="round"/>
+              <g fill="#5f6575" font-size="10" font-family="ui-monospace, Menlo"><text x="6" y="140">W1</text><text x="84" y="140">W3</text><text x="162" y="140">W5</text><text x="240" y="140">W7</text><text x="303" y="140">Now</text></g>
+            </svg>
+          </article>
+
+          <article class="card card-pad" style="margin-top:12px;background:linear-gradient(145deg,#122018,#0d1110);border-color:rgba(52,211,153,.16)">
+            <div class="between">
+              <div>
+                <span class="eyebrow">Exam readiness</span>
+                <h2 style="margin:7px 0 4px;font-size:19px">Nearly there</h2>
+                <p class="body">Closing the grammar gap takes you past 90% readiness.</p>
+              </div>
+              <div class="ring" style="--p:78;--size:104px;--c:var(--good)">
+                <svg viewBox="0 0 120 120">
+                  <circle class="track" cx="60" cy="60" r="50" fill="none" stroke-width="11"/>
+                  <circle class="value" cx="60" cy="60" r="50" fill="none" stroke-width="11"/>
+                </svg>
+                <div class="ring-content"><strong class="mono" style="font-size:29px">78%</strong></div>
+              </div>
+            </div>
+          </article>
+
+          <div class="section-head">
+            <h2>Metric changes</h2>
+          </div>
+          <div class="grid-2">
+            <div class="metric-card"><h3>Grammar</h3><strong class="mono" style="color:var(--bad)">+12 pts</strong></div>
+            <div class="metric-card"><h3>Vocabulary</h3><strong class="mono" style="color:var(--primary-2)">+8 pts</strong></div>
+            <div class="metric-card"><h3>Coherence</h3><strong class="mono" style="color:var(--warn)">+6 pts</strong></div>
+            <div class="metric-card"><h3>Errors / essay</h3><strong class="mono" style="color:var(--good)">-41%</strong></div>
+          </div>
+
+          <div class="section-head">
+            <h2>Error frequency</h2>
+          </div>
+          <div class="card card-pad stack">
+            <div class="skill"><div class="skill-top"><span>Tenses</span><span>34%</span></div><div class="bar"><span style="--v:34%;--c:var(--bad)"></span></div></div>
+            <div class="skill"><div class="skill-top"><span>Articles</span><span>26%</span></div><div class="bar"><span style="--v:26%;--c:var(--warn)"></span></div></div>
+            <div class="skill"><div class="skill-top"><span>Prepositions</span><span>18%</span></div><div class="bar"><span style="--v:18%;--c:var(--primary)"></span></div></div>
+          </div>
+        </section>
+
+        <section class="screen" data-panel="coach">
+          <header class="appbar">
+            <div>
+              <p class="kicker">Week of May 25</p>
+              <h1 class="title">AI Coach</h1>
+            </div>
+            <div class="coach-mark">
+              <svg width="23" height="23" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.3" stroke-linecap="round" stroke-linejoin="round"><path d="M12 3 4 6v6c0 4 3.5 7 8 9 4.5-2 8-5 8-9V6z"/><path d="M9 12l2 2 4-4"/></svg>
+            </div>
+          </header>
+
+          <article class="coach-hero">
+            <div class="coach-mark">
+              <svg width="23" height="23" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.3" stroke-linecap="round" stroke-linejoin="round"><path d="M12 3 4 6v6c0 4 3.5 7 8 9 4.5-2 8-5 8-9V6z"/><path d="M9 12l2 2 4-4"/></svg>
+            </div>
+            <div>
+              <h2>You are on track for Band 7.5.</h2>
+              <p class="body">Your ideas are strong and organized. Grammar accuracy is the biggest lever for the next half-band.</p>
+            </div>
+          </article>
+
+          <article class="card card-pad" style="margin-top:12px">
+            <span class="eyebrow">Predicted exam band</span>
+            <div class="between" style="margin-top:13px">
+              <div class="row" style="align-items:baseline;gap:9px">
+                <span class="mono" style="color:var(--muted);font-size:26px;font-weight:750">6.5</span>
+                <svg width="24" height="15" viewBox="0 0 24 15" fill="none" stroke="var(--good)" stroke-width="2.4" stroke-linecap="round"><path d="M2 12h20M15 5l7 7-7 7" transform="translate(0 -4)"/></svg>
+                <span class="mono" style="color:var(--good);font-size:38px;font-weight:750">7.5</span>
+              </div>
+              <span class="chip chip-good">+8 weeks</span>
+            </div>
+          </article>
+
+          <div class="section-head">
+            <h2>Priority plan</h2>
+          </div>
+          <div class="stack">
+            <div class="plan-row">
+              <div class="day">MON</div>
+              <div style="flex:1"><strong style="font-size:14px">Tense drills + 5 corrections</strong><p class="subtitle">15 min</p></div>
+            </div>
+            <div class="plan-row">
+              <div class="day">WED</div>
+              <div style="flex:1"><strong style="font-size:14px">Rewrite an essay, focus on articles</strong><p class="subtitle">25 min</p></div>
+            </div>
+            <div class="plan-row">
+              <div class="day">FRI</div>
+              <div style="flex:1"><strong style="font-size:14px">Learn 10 academic collocations</strong><p class="subtitle">15 min</p></div>
+            </div>
+            <div class="plan-row">
+              <div class="day">SUN</div>
+              <div style="flex:1"><strong style="font-size:14px">Timed Task 2 under exam conditions</strong><p class="subtitle">40 min</p></div>
+            </div>
+          </div>
+
+          <article class="card card-pad" style="margin-top:22px;background:linear-gradient(160deg,#1a1d2c,#11131b);border-color:rgba(154,163,255,.16)">
+            <svg width="26" height="26" viewBox="0 0 24 24" fill="rgba(154,163,255,.55)" aria-hidden="true"><path d="M10 7H7a3 3 0 0 0-3 3v7h6v-6H7a1 1 0 0 1 1-1h2zM20 7h-3a3 3 0 0 0-3 3v7h6v-6h-3a1 1 0 0 1 1-1h2z"/></svg>
+            <p style="margin:10px 0 0;color:var(--ink);font-size:16px;line-height:1.45;font-weight:750">Your structure is clean now. Tighten tenses and articles, and Band 7.5 becomes a realistic target.</p>
+            <p class="subtitle" style="margin-top:12px">- Writing Coach</p>
+          </article>
+        </section>
+
+        <section class="screen" data-panel="profile">
+          <header class="appbar">
+            <div class="row" style="gap:14px">
+              <div class="avatar" style="width:64px;height:64px;border-radius:21px;font-size:24px">AO</div>
+              <div>
+                <h1 class="title" style="font-size:24px">Amara Okafor</h1>
+                <p class="subtitle">IELTS Academic - Target 7.5</p>
+              </div>
+            </div>
+          </header>
+          <div class="grid-3">
+            <div class="stat"><strong class="mono" style="color:var(--primary-2)">78</strong><span>Health</span></div>
+            <div class="stat"><strong class="mono">47</strong><span>Essays</span></div>
+            <div class="stat"><strong class="mono" style="color:var(--warn)">5</strong><span>Streak</span></div>
+          </div>
+          <div class="section-head"><h2>Account</h2></div>
+          <div class="stack">
+            <div class="plan-row"><div class="badge-icon" style="--soft:var(--primary-soft);--color:var(--primary-2)">12</div><div><strong>Credit balance</strong><p class="subtitle">Buy more when you need deeper analysis.</p></div></div>
+            <div class="plan-row"><div class="badge-icon" style="--soft:var(--good-soft);--color:var(--good)">7.5</div><div><strong>Exam & goal</strong><p class="subtitle">IELTS Academic target band.</p></div></div>
+            <div class="plan-row"><div class="badge-icon" style="--soft:var(--warn-soft);--color:var(--warn)">9:00</div><div><strong>Daily reminder</strong><p class="subtitle">Morning writing session.</p></div></div>
+          </div>
+        </section>
+
+        <nav class="tabbar" aria-label="Primary navigation">
+          <div class="tabbar-inner">
+            <button class="tab active" data-screen="home" aria-label="Home">
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M3 10.5 12 3l9 7.5"/><path d="M5.5 9.5V20h13V9.5"/></svg>
+              Home
+            </button>
+            <button class="tab" data-screen="progress" aria-label="Progress">
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M4 20h16"/><path d="M7 20v-6M12 20V8M17 20v-9"/></svg>
+              Progress
+            </button>
+            <button class="tab" data-screen="write" aria-label="Write">
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.1" stroke-linecap="round" stroke-linejoin="round"><path d="M4 20l1-4L16 5a2.1 2.1 0 0 1 3 3L8 19z"/><path d="M14.5 5.5l4 4"/></svg>
+              Write
+            </button>
+            <button class="tab" data-screen="coach" aria-label="Coach">
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 3 4 6v6c0 4 3.5 7 8 9 4.5-2 8-5 8-9V6z"/><path d="M9 12l2 2 4-4"/></svg>
+              Coach
+            </button>
+            <button class="tab" data-screen="profile" aria-label="Profile">
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="8.5" r="3.7"/><path d="M5 20a7 7 0 0 1 14 0"/></svg>
+              Profile
+            </button>
+          </div>
+        </nav>
+        <div class="home-indicator"></div>
+      </div>
+    </section>
+
+    <aside class="side"></aside>
+  </main>
+
+  <script>
+    const panels = Array.from(document.querySelectorAll('[data-panel]'));
+    const tabs = Array.from(document.querySelectorAll('.tab'));
+    const themeButtons = Array.from(document.querySelectorAll('[data-theme-choice]'));
+    const themeCycleButton = document.querySelector('[data-theme-cycle]');
+    const themeNote = document.getElementById('themeNote');
+    const themeOrder = ['dark', 'day', 'a11y'];
+    const themeNotes = {
+      dark: 'Dark is the primary premium direction: richer, calmer, and closer to the Claude reference.',
+      day: 'Day keeps the same hierarchy in a bright exam-prep surface for users who prefer light mode.',
+      a11y: 'Accessible increases contrast, enlarges key text, strengthens borders, and removes motion.',
+    };
+    const themeIcons = {
+      dark: '<svg viewBox="0 0 24 24" aria-hidden="true"><path fill="currentColor" d="M20.3 14.9a8.1 8.1 0 0 1-9.8-11A8.8 8.8 0 1 0 20.3 14.9Z"/><path fill="currentColor" d="M17.8 3.1l.6 1.7 1.7.6-1.7.6-.6 1.7-.6-1.7-1.7-.6 1.7-.6.6-1.7ZM20.2 8.4l.35 1.05 1.05.35-1.05.35-.35 1.05-.35-1.05-1.05-.35 1.05-.35.35-1.05Z"/></svg>',
+      day: '<svg viewBox="0 0 24 24" aria-hidden="true"><circle cx="12" cy="12" r="4.7" fill="currentColor"/><g fill="currentColor"><rect x="11" y="1.7" width="2" height="4" rx="1"/><rect x="11" y="18.3" width="2" height="4" rx="1"/><rect x="18.3" y="11" width="4" height="2" rx="1"/><rect x="1.7" y="11" width="4" height="2" rx="1"/><rect x="16.8" y="4" width="2" height="4" rx="1" transform="rotate(45 17.8 6)"/><rect x="5.2" y="16" width="2" height="4" rx="1" transform="rotate(45 6.2 18)"/><rect x="16" y="16.8" width="4" height="2" rx="1" transform="rotate(45 18 17.8)"/><rect x="4" y="5.2" width="4" height="2" rx="1" transform="rotate(45 6 6.2)"/></g></svg>',
+      a11y: '<svg viewBox="0 0 24 24" aria-hidden="true"><path fill="currentColor" d="M7.2 19.1h9.1a5 5 0 0 0 .9-9.9A6.5 6.5 0 0 0 4.7 11.4a3.9 3.9 0 0 0 2.5 7.7Z"/></svg>',
+    };
+
+    function showScreen(name) {
+      panels.forEach((panel) => {
+        panel.classList.toggle('active', panel.dataset.panel === name);
+        if (panel.dataset.panel === name) panel.scrollTop = 0;
+      });
+      tabs.forEach((tab) => tab.classList.toggle('active', tab.dataset.screen === name));
+    }
+
+    function setTheme(theme) {
+      const nextTheme = themeNotes[theme] ? theme : 'dark';
+      document.body.dataset.theme = nextTheme;
+      themeButtons.forEach((button) => {
+        button.classList.toggle('active', button.dataset.themeChoice === nextTheme);
+        button.setAttribute('aria-pressed', button.dataset.themeChoice === nextTheme ? 'true' : 'false');
+      });
+      if (themeCycleButton) {
+        const nextIndex = (themeOrder.indexOf(nextTheme) + 1) % themeOrder.length;
+        const nextLabel = themeOrder[nextIndex] === 'a11y' ? 'Accessible' : themeOrder[nextIndex][0].toUpperCase() + themeOrder[nextIndex].slice(1);
+        themeCycleButton.innerHTML = themeIcons[nextTheme];
+        themeCycleButton.setAttribute('aria-label', 'Switch to ' + nextLabel + ' theme');
+        themeCycleButton.setAttribute('title', 'Current: ' + (nextTheme === 'a11y' ? 'Accessible' : nextTheme) + '. Click for ' + nextLabel + '.');
+      }
+      if (themeNote) themeNote.textContent = themeNotes[nextTheme];
+      try {
+        localStorage.setItem('writingCoachPreviewTheme', nextTheme);
+      } catch (_) {}
+    }
+
+    themeButtons.forEach((button) => {
+      button.addEventListener('click', () => setTheme(button.dataset.themeChoice));
+    });
+
+    if (themeCycleButton) {
+      themeCycleButton.addEventListener('click', () => {
+        const current = document.body.dataset.theme || 'dark';
+        const next = themeOrder[(themeOrder.indexOf(current) + 1) % themeOrder.length];
+        setTheme(next);
+      });
+    }
+
+    document.addEventListener('click', (event) => {
+      const target = event.target.closest('[data-screen], [data-go]');
+      if (!target) return;
+      const screen = target.dataset.screen || target.dataset.go;
+      showScreen(screen);
+    });
+
+    const essay = document.getElementById('essay');
+    const wordCount = document.getElementById('wordCount');
+    const wordBar = document.getElementById('wordBar');
+
+    function updateWords() {
+      const count = (essay.value.trim().match(/\S+/g) || []).length;
+      const pct = Math.min(100, Math.round((count / 250) * 100));
+      wordCount.textContent = count;
+      wordBar.style.setProperty('--v', pct + '%');
+      wordBar.style.setProperty('--c', count >= 250 ? 'var(--good)' : 'var(--primary)');
+    }
+
+    essay.addEventListener('input', updateWords);
+    updateWords();
+    let savedTheme = 'dark';
+    try {
+      savedTheme = localStorage.getItem('writingCoachPreviewTheme') || 'dark';
+    } catch (_) {}
+    setTheme(savedTheme);
+  </script>
+</body>
+</html>

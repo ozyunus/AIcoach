@@ -1,7 +1,7 @@
 import 'package:ai_coach/src/core/application/writing_coach_state.dart';
 import 'package:ai_coach/src/core/design/app_colors.dart';
 import 'package:ai_coach/src/core/design/app_components.dart';
-import 'package:ai_coach/src/core/design/app_spacing.dart';
+import 'package:ai_coach/src/core/design/app_typography.dart';
 import 'package:ai_coach/src/features/shell/application/app_tab.dart';
 import 'package:ai_coach/src/features/shell/application/selected_tab_controller.dart';
 import 'package:flutter/material.dart';
@@ -17,7 +17,13 @@ class CoachScreen extends ConsumerWidget {
 
     return AppScreen(
       screenKey: const ValueKey('screen-coach'),
-      title: 'Coach',
+      title: 'AI Coach',
+      subtitle: 'Week of May 25',
+      trailing: IconBadge(
+        icon: Icons.auto_awesome_rounded,
+        backgroundColor: context.colors.primary,
+        foregroundColor: context.colors.primaryInk,
+      ),
       children: [
         if (latest == null)
           _CoachEmptyCard(
@@ -25,40 +31,35 @@ class CoachScreen extends ConsumerWidget {
                 ref.read(selectedTabProvider.notifier).select(AppTab.write),
           )
         else ...[
-          _CoachReportCard(essay: latest),
-          const AppSectionHeader(title: 'Recommended drills'),
-          ..._recommendationsFor(
-            latest.analysis,
-          ).map((item) => _RecommendationTile(item: item)),
+          _CoachHero(essay: latest),
+          _PredictionCard(essay: latest),
+          const AppSectionHeader(title: 'Priority plan'),
+          const _PlanRow(
+            day: 'MON',
+            title: 'Tense drills + 5 corrections',
+            meta: '15 min',
+          ),
+          const _PlanRow(
+            day: 'WED',
+            title: 'Rewrite an essay, focus on articles',
+            meta: '25 min',
+          ),
+          const _PlanRow(
+            day: 'FRI',
+            title: 'Learn 10 academic collocations',
+            meta: '15 min',
+          ),
+          const _PlanRow(
+            day: 'SUN',
+            title: 'Timed Task 2 under exam conditions',
+            meta: '40 min',
+          ),
+          _CoachQuote(essay: latest),
         ],
         const AppSectionHeader(title: 'Challenge focus'),
         ...state.challenges.map((challenge) => _ChallengeTile(challenge)),
       ],
     );
-  }
-
-  List<_Recommendation> _recommendationsFor(EssayAnalysis analysis) {
-    final focusSkill = analysis.skillScores
-        .reduce((a, b) => a.score < b.score ? a : b)
-        .label;
-
-    return [
-      _Recommendation(
-        icon: Icons.auto_fix_high_rounded,
-        title: 'Rewrite your weakest paragraph',
-        meta: '10 min · $focusSkill',
-      ),
-      const _Recommendation(
-        icon: Icons.menu_book_rounded,
-        title: 'Upgrade 10 academic collocations',
-        meta: '15 min · Vocabulary',
-      ),
-      const _Recommendation(
-        icon: Icons.rule_rounded,
-        title: 'Fix article usage in five sentences',
-        meta: '8 min · Grammar',
-      ),
-    ];
   }
 }
 
@@ -71,11 +72,16 @@ class _CoachEmptyCard extends StatelessWidget {
   Widget build(BuildContext context) {
     final colors = context.colors;
 
-    return DesignCard(
+    return GradientCard(
+      accent: colors.good,
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-          Icon(Icons.psychology_alt_outlined, color: colors.primary, size: 36),
+          IconBadge(
+            icon: Icons.psychology_alt_outlined,
+            backgroundColor: colors.goodTint,
+            foregroundColor: colors.good,
+          ),
           const SizedBox(height: 14),
           Text(
             'Your coach needs one essay first.',
@@ -102,8 +108,8 @@ class _CoachEmptyCard extends StatelessWidget {
   }
 }
 
-class _CoachReportCard extends StatelessWidget {
-  const _CoachReportCard({required this.essay});
+class _CoachHero extends StatelessWidget {
+  const _CoachHero({required this.essay});
 
   final EssayRecord essay;
 
@@ -114,48 +120,35 @@ class _CoachReportCard extends StatelessWidget {
       (a, b) => a.score < b.score ? a : b,
     );
 
-    return DesignCard(
-      child: Column(
+    return GradientCard(
+      accent: colors.good,
+      padding: const EdgeInsets.all(18),
+      child: Row(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-          const AppPill(
-            icon: Icons.calendar_month_outlined,
-            label: 'Mock report',
+          IconBadge(
+            icon: Icons.verified_rounded,
+            backgroundColor: colors.good,
+            foregroundColor: colors.background,
           ),
-          const SizedBox(height: 14),
-          Text(
-            'Your next score lift is ${weakest.label.toLowerCase()}.',
-            style: Theme.of(
-              context,
-            ).textTheme.titleLarge?.copyWith(fontWeight: FontWeight.w900),
-          ),
-          const SizedBox(height: 10),
-          Text(
-            'You submitted ${essay.wordCount} words and scored ${essay.normalizedScore}/100. '
-            'Keep the structure, then focus on the correction categories below before the next essay.',
-            style: Theme.of(
-              context,
-            ).textTheme.bodyMedium?.copyWith(color: colors.ink2, height: 1.45),
-          ),
-          const SizedBox(height: 16),
-          Container(
-            width: double.infinity,
-            padding: const EdgeInsets.all(14),
-            decoration: BoxDecoration(
-              color: colors.primarySoft,
-              borderRadius: AppSpacing.mediumRadius,
-            ),
-            child: Row(
+          const SizedBox(width: 14),
+          Expanded(
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
               children: [
-                Icon(Icons.track_changes_rounded, color: colors.primary),
-                const SizedBox(width: 10),
-                Expanded(
-                  child: Text(
-                    'Focus area: ${weakest.label} (${weakest.score}/100)',
-                    style: Theme.of(context).textTheme.bodyMedium?.copyWith(
-                      color: colors.ink,
-                      fontWeight: FontWeight.w900,
-                    ),
+                Text(
+                  'You are on track for ${essay.analysis.rawScore == '0' ? 'your goal' : 'Band 7.5'}.',
+                  style: Theme.of(context).textTheme.titleMedium?.copyWith(
+                    color: colors.ink,
+                    fontWeight: FontWeight.w900,
+                  ),
+                ),
+                const SizedBox(height: 6),
+                Text(
+                  'Your ideas are organized. ${weakest.label} is the biggest lever for the next score lift.',
+                  style: Theme.of(context).textTheme.bodyMedium?.copyWith(
+                    color: colors.ink2,
+                    height: 1.55,
                   ),
                 ),
               ],
@@ -167,63 +160,159 @@ class _CoachReportCard extends StatelessWidget {
   }
 }
 
-class _Recommendation {
-  const _Recommendation({
-    required this.icon,
-    required this.title,
-    required this.meta,
-  });
+class _PredictionCard extends StatelessWidget {
+  const _PredictionCard({required this.essay});
 
-  final IconData icon;
-  final String title;
-  final String meta;
-}
-
-class _RecommendationTile extends StatelessWidget {
-  const _RecommendationTile({required this.item});
-
-  final _Recommendation item;
+  final EssayRecord essay;
 
   @override
   Widget build(BuildContext context) {
     final colors = context.colors;
 
     return DesignCard(
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          Text(
+            'Predicted exam band',
+            style: Theme.of(context).textTheme.labelSmall?.copyWith(
+              color: colors.ink4,
+              fontWeight: FontWeight.w900,
+              letterSpacing: 0.9,
+            ),
+          ),
+          const SizedBox(height: 14),
+          Row(
+            children: [
+              Text(
+                essay.rawScore,
+                style: AppTypography.number(
+                  colors: colors,
+                  size: 28,
+                  color: colors.ink3,
+                  weight: FontWeight.w800,
+                ),
+              ),
+              const SizedBox(width: 10),
+              Icon(Icons.arrow_forward_rounded, color: colors.good, size: 26),
+              const SizedBox(width: 10),
+              Text(
+                '7.5',
+                style: AppTypography.number(
+                  colors: colors,
+                  size: 40,
+                  color: colors.good,
+                  weight: FontWeight.w800,
+                ),
+              ),
+              const Spacer(),
+              AppPill(
+                label: '+8 weeks',
+                backgroundColor: colors.goodTint,
+                foregroundColor: colors.good,
+              ),
+            ],
+          ),
+        ],
+      ),
+    );
+  }
+}
+
+class _PlanRow extends StatelessWidget {
+  const _PlanRow({required this.day, required this.title, required this.meta});
+
+  final String day;
+  final String title;
+  final String meta;
+
+  @override
+  Widget build(BuildContext context) {
+    final colors = context.colors;
+
+    return DesignCard(
+      padding: const EdgeInsets.all(15),
       child: Row(
         children: [
           Container(
             width: 44,
             height: 44,
             decoration: BoxDecoration(
-              color: colors.violetTint,
-              borderRadius: AppSpacing.mediumRadius,
+              color: colors.primaryTint,
+              borderRadius: BorderRadius.circular(14),
+              border: Border.all(color: colors.line),
             ),
-            child: Icon(item.icon, color: colors.violet),
+            child: Center(
+              child: Text(
+                day,
+                style: Theme.of(context).textTheme.labelSmall?.copyWith(
+                  color: colors.primaryTintStrong,
+                  fontWeight: FontWeight.w900,
+                ),
+              ),
+            ),
           ),
-          const SizedBox(width: 12),
+          const SizedBox(width: 13),
           Expanded(
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
                 Text(
-                  item.title,
+                  title,
                   style: Theme.of(context).textTheme.titleSmall?.copyWith(
                     color: colors.ink,
                     fontWeight: FontWeight.w900,
                   ),
                 ),
-                const SizedBox(height: 4),
+                const SizedBox(height: 3),
                 Text(
-                  item.meta,
+                  meta,
                   style: Theme.of(context).textTheme.bodySmall?.copyWith(
-                    color: colors.ink2,
+                    color: colors.ink3,
                     fontWeight: FontWeight.w700,
                   ),
                 ),
               ],
             ),
           ),
-          Icon(Icons.chevron_right_rounded, color: colors.ink4),
+        ],
+      ),
+    );
+  }
+}
+
+class _CoachQuote extends StatelessWidget {
+  const _CoachQuote({required this.essay});
+
+  final EssayRecord essay;
+
+  @override
+  Widget build(BuildContext context) {
+    final colors = context.colors;
+
+    return GradientCard(
+      padding: const EdgeInsets.all(18),
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          Icon(Icons.format_quote_rounded, color: colors.primaryTintStrong),
+          const SizedBox(height: 8),
+          Text(
+            'Your structure is clean now. Tighten the correction categories from your last essay and the next band becomes realistic.',
+            style: Theme.of(context).textTheme.titleSmall?.copyWith(
+              color: colors.ink,
+              height: 1.45,
+              fontWeight: FontWeight.w900,
+            ),
+          ),
+          const SizedBox(height: 10),
+          Text(
+            'Writing Coach',
+            style: Theme.of(context).textTheme.bodySmall?.copyWith(
+              color: colors.ink3,
+              fontWeight: FontWeight.w700,
+            ),
+          ),
         ],
       ),
     );
@@ -240,6 +329,7 @@ class _ChallengeTile extends StatelessWidget {
     final colors = context.colors;
 
     return DesignCard(
+      padding: const EdgeInsets.all(16),
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [

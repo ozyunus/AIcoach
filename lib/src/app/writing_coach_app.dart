@@ -13,11 +13,14 @@ class WritingCoachApp extends ConsumerWidget {
     final isSignedIn = ref.watch(
       writingCoachProvider.select((state) => state.isSignedIn),
     );
+    final themeMode = ref.watch(
+      writingCoachProvider.select((state) => state.themeMode),
+    );
 
     return MaterialApp(
       title: 'Writing Coach',
       debugShowCheckedModeBanner: false,
-      theme: AppTheme.light(),
+      theme: AppTheme.forMode(themeMode),
       home: isSignedIn ? const WritingCoachShell() : const AuthScreen(),
     );
   }

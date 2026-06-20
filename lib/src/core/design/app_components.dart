@@ -6,21 +6,37 @@ class AppScreen extends StatelessWidget {
   const AppScreen({
     required this.title,
     required this.children,
+    this.subtitle,
+    this.trailing,
     this.screenKey,
     super.key,
   });
 
   final Key? screenKey;
   final String title;
+  final String? subtitle;
+  final Widget? trailing;
   final List<Widget> children;
 
   @override
   Widget build(BuildContext context) {
     final colors = context.colors;
 
-    return ColoredBox(
+    return DecoratedBox(
       key: screenKey,
-      color: colors.background,
+      decoration: BoxDecoration(
+        color: colors.background,
+        gradient: colors.isDark && !colors.isHighContrast
+            ? RadialGradient(
+                center: const Alignment(0, -1.18),
+                radius: 0.9,
+                colors: [
+                  colors.primary.withValues(alpha: 0.22),
+                  colors.background,
+                ],
+              )
+            : null,
+      ),
       child: SafeArea(
         bottom: false,
         child: CustomScrollView(
@@ -30,13 +46,40 @@ class AppScreen extends StatelessWidget {
               child: Padding(
                 padding: const EdgeInsets.fromLTRB(
                   AppSpacing.screenX,
-                  AppSpacing.screenTop,
-                  AppSpacing.screenX,
                   10,
+                  AppSpacing.screenX,
+                  18,
                 ),
-                child: Text(
-                  title,
-                  style: Theme.of(context).textTheme.displaySmall,
+                child: Row(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    Expanded(
+                      child: Column(
+                        crossAxisAlignment: CrossAxisAlignment.start,
+                        children: [
+                          Text(
+                            title,
+                            style: Theme.of(context).textTheme.displaySmall,
+                          ),
+                          if (subtitle != null) ...[
+                            const SizedBox(height: 4),
+                            Text(
+                              subtitle!,
+                              style: Theme.of(context).textTheme.bodySmall
+                                  ?.copyWith(
+                                    color: colors.ink3,
+                                    fontWeight: FontWeight.w700,
+                                  ),
+                            ),
+                          ],
+                        ],
+                      ),
+                    ),
+                    if (trailing != null) ...[
+                      const SizedBox(width: 12),
+                      trailing!,
+                    ],
+                  ],
                 ),
               ),
             ),
@@ -81,20 +124,80 @@ class DesignCard extends StatelessWidget {
       decoration: BoxDecoration(
         color: colors.card,
         borderRadius: AppSpacing.cardRadius,
-        border: Border.all(color: colors.line2),
-        boxShadow: const [
-          BoxShadow(
-            color: Color(0x0D111827),
-            blurRadius: 2,
-            offset: Offset(0, 1),
-          ),
-          BoxShadow(
-            color: Color(0x21111827),
-            blurRadius: 20,
-            spreadRadius: -14,
-            offset: Offset(0, 8),
-          ),
-        ],
+        border: Border.all(
+          color: colors.line,
+          width: colors.isHighContrast ? 2 : 1,
+        ),
+        boxShadow: colors.isHighContrast
+            ? const []
+            : [
+                BoxShadow(
+                  color: colors.isDark
+                      ? Colors.black.withValues(alpha: 0.24)
+                      : const Color(0x221D2A48),
+                  blurRadius: 38,
+                  spreadRadius: -28,
+                  offset: const Offset(0, 18),
+                ),
+              ],
+      ),
+      child: child,
+    );
+  }
+}
+
+class GradientCard extends StatelessWidget {
+  const GradientCard({
+    required this.child,
+    this.padding = const EdgeInsets.all(21),
+    this.accent,
+    super.key,
+  });
+
+  final Widget child;
+  final EdgeInsetsGeometry padding;
+  final Color? accent;
+
+  @override
+  Widget build(BuildContext context) {
+    final colors = context.colors;
+    final tint = accent ?? colors.primary;
+
+    return Container(
+      width: double.infinity,
+      padding: padding,
+      decoration: BoxDecoration(
+        borderRadius: BorderRadius.circular(28),
+        border: Border.all(
+          color: colors.isHighContrast
+              ? colors.line
+              : tint.withValues(alpha: colors.isDark ? 0.22 : 0.16),
+          width: colors.isHighContrast ? 2 : 1,
+        ),
+        gradient: colors.isHighContrast
+            ? null
+            : LinearGradient(
+                begin: Alignment.topLeft,
+                end: Alignment.bottomRight,
+                colors: colors.isDark
+                    ? [
+                        tint.withValues(alpha: 0.22),
+                        colors.card,
+                        colors.background,
+                      ]
+                    : [tint.withValues(alpha: 0.1), colors.card, colors.sunken],
+              ),
+        color: colors.isHighContrast ? colors.card : null,
+        boxShadow: colors.isHighContrast
+            ? const []
+            : [
+                BoxShadow(
+                  color: tint.withValues(alpha: colors.isDark ? 0.26 : 0.18),
+                  blurRadius: 54,
+                  spreadRadius: -36,
+                  offset: const Offset(0, 24),
+                ),
+              ],
       ),
       child: child,
     );
@@ -118,7 +221,7 @@ class AppSectionHeader extends StatelessWidget {
     final colors = context.colors;
 
     return Padding(
-      padding: const EdgeInsets.only(top: 6, bottom: 2),
+      padding: const EdgeInsets.only(top: 10, bottom: 2),
       child: Row(
         children: [
           Expanded(
@@ -132,6 +235,11 @@ class AppSectionHeader extends StatelessWidget {
           ),
           if (actionLabel != null)
             TextButton(
+              style: TextButton.styleFrom(
+                minimumSize: Size.zero,
+                padding: const EdgeInsets.symmetric(horizontal: 6, vertical: 4),
+                tapTargetSize: MaterialTapTargetSize.shrinkWrap,
+              ),
               onPressed: onAction,
               child: Text(
                 actionLabel!,
@@ -173,7 +281,8 @@ class AppPill extends StatelessWidget {
       ),
       decoration: BoxDecoration(
         color: backgroundColor ?? colors.primaryTint,
-        borderRadius: AppSpacing.smallRadius,
+        borderRadius: BorderRadius.circular(999),
+        border: Border.all(color: (foreground).withValues(alpha: 0.14)),
       ),
       child: Row(
         mainAxisSize: MainAxisSize.min,
@@ -211,13 +320,25 @@ class AppProgressBar extends StatelessWidget {
   Widget build(BuildContext context) {
     final colors = context.colors;
 
-    return ClipRRect(
-      borderRadius: BorderRadius.circular(height),
-      child: LinearProgressIndicator(
-        minHeight: height,
-        value: value.clamp(0, 1).toDouble(),
-        color: color ?? colors.primary,
-        backgroundColor: colors.sunken,
+    return Container(
+      height: colors.isHighContrast ? height + 2 : height,
+      decoration: BoxDecoration(
+        color: colors.isDark
+            ? Colors.white.withValues(
+                alpha: colors.isHighContrast ? 0.18 : 0.07,
+              )
+            : colors.sunken,
+        borderRadius: BorderRadius.circular(height),
+      ),
+      alignment: Alignment.centerLeft,
+      child: FractionallySizedBox(
+        widthFactor: value.clamp(0, 1).toDouble(),
+        child: Container(
+          decoration: BoxDecoration(
+            color: color ?? colors.primary,
+            borderRadius: BorderRadius.circular(height),
+          ),
+        ),
       ),
     );
   }
@@ -242,8 +363,9 @@ class AppMetricTile extends StatelessWidget {
     return Container(
       padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 14),
       decoration: BoxDecoration(
-        color: colors.sunken,
+        color: colors.card,
         borderRadius: AppSpacing.mediumRadius,
+        border: Border.all(color: colors.line),
       ),
       child: Column(
         children: [
@@ -267,6 +389,86 @@ class AppMetricTile extends StatelessWidget {
               fontWeight: FontWeight.w700,
             ),
           ),
+        ],
+      ),
+    );
+  }
+}
+
+class IconBadge extends StatelessWidget {
+  const IconBadge({
+    required this.icon,
+    this.backgroundColor,
+    this.foregroundColor,
+    this.size = 44,
+    super.key,
+  });
+
+  final IconData icon;
+  final Color? backgroundColor;
+  final Color? foregroundColor;
+  final double size;
+
+  @override
+  Widget build(BuildContext context) {
+    final colors = context.colors;
+
+    return Container(
+      width: size,
+      height: size,
+      decoration: BoxDecoration(
+        color: backgroundColor ?? colors.primaryTint,
+        borderRadius: BorderRadius.circular(size * 0.32),
+        border: Border.all(color: colors.line),
+      ),
+      child: Icon(
+        icon,
+        color: foregroundColor ?? colors.primary,
+        size: size * 0.48,
+      ),
+    );
+  }
+}
+
+class ScoreRing extends StatelessWidget {
+  const ScoreRing({
+    required this.value,
+    required this.child,
+    this.size = 132,
+    this.strokeWidth = 11,
+    this.color,
+    super.key,
+  });
+
+  final int value;
+  final Widget child;
+  final double size;
+  final double strokeWidth;
+  final Color? color;
+
+  @override
+  Widget build(BuildContext context) {
+    final colors = context.colors;
+    final progress = value.clamp(0, 100) / 100;
+
+    return SizedBox.square(
+      dimension: size,
+      child: Stack(
+        alignment: Alignment.center,
+        children: [
+          SizedBox.square(
+            dimension: size,
+            child: CircularProgressIndicator(
+              value: progress,
+              strokeWidth: strokeWidth,
+              strokeCap: StrokeCap.round,
+              color: color ?? colors.primary,
+              backgroundColor: colors.isDark
+                  ? Colors.white.withValues(alpha: 0.08)
+                  : colors.sunken,
+            ),
+          ),
+          child,
         ],
       ),
     );

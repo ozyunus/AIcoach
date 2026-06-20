@@ -1,4 +1,5 @@
 import 'package:ai_coach/src/features/auth/data/auth_repository.dart';
+import 'package:ai_coach/src/core/design/app_theme_mode.dart';
 import 'package:ai_coach/src/features/write/data/essay_repository.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
@@ -113,6 +114,10 @@ class WritingCoachController extends Notifier<WritingCoachState> {
     }
   }
 
+  void cycleThemeMode() {
+    state = state.copyWith(themeMode: state.themeMode.next);
+  }
+
   void updateDraft(String value) {
     state = state.copyWith(draftEssay: value);
   }
@@ -217,6 +222,7 @@ class WritingCoachState {
     required this.challenges,
     required this.draftEssay,
     required this.latestAnalysis,
+    required this.themeMode,
     required this.isAuthenticating,
     required this.isLoadingEssays,
     required this.isSubmittingEssay,
@@ -229,6 +235,7 @@ class WritingCoachState {
   final List<ChallengeProgress> challenges;
   final String draftEssay;
   final EssayAnalysis? latestAnalysis;
+  final WritingCoachThemeMode themeMode;
   final bool isAuthenticating;
   final bool isLoadingEssays;
   final bool isSubmittingEssay;
@@ -301,6 +308,7 @@ class WritingCoachState {
       ],
       draftEssay: '',
       latestAnalysis: null,
+      themeMode: WritingCoachThemeMode.dark,
       isAuthenticating: false,
       isLoadingEssays: false,
       isSubmittingEssay: false,
@@ -315,6 +323,7 @@ class WritingCoachState {
     List<ChallengeProgress>? challenges,
     String? draftEssay,
     EssayAnalysis? latestAnalysis,
+    WritingCoachThemeMode? themeMode,
     bool? isAuthenticating,
     bool? isLoadingEssays,
     bool? isSubmittingEssay,
@@ -329,6 +338,7 @@ class WritingCoachState {
       challenges: challenges ?? this.challenges,
       draftEssay: draftEssay ?? this.draftEssay,
       latestAnalysis: latestAnalysis ?? this.latestAnalysis,
+      themeMode: themeMode ?? this.themeMode,
       isAuthenticating: isAuthenticating ?? this.isAuthenticating,
       isLoadingEssays: isLoadingEssays ?? this.isLoadingEssays,
       isSubmittingEssay: isSubmittingEssay ?? this.isSubmittingEssay,

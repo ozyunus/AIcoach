@@ -50,32 +50,91 @@ class WritingCoachColors extends ThemeExtension<WritingCoachColors> {
   final Color violet;
   final Color violetTint;
 
-  factory WritingCoachColors.light() {
+  factory WritingCoachColors.dark() {
     return const WritingCoachColors(
-      primary: Color(0xFF2F5FE0),
+      primary: Color(0xFF696FFF),
       primaryInk: Color(0xFFFFFFFF),
-      primaryTint: Color(0xFFEAF0FF),
-      primaryTintStrong: Color(0xFFDCE6FF),
-      primarySoft: Color(0xFFF4F7FF),
-      background: Color(0xFFF8F9FC),
-      sunken: Color(0xFFF0F3F8),
-      card: Color(0xFFFFFFFF),
-      ink: Color(0xFF273244),
-      ink2: Color(0xFF626B7A),
-      ink3: Color(0xFF8D95A1),
-      ink4: Color(0xFFB6BDC8),
-      line: Color(0xFFE3E7EF),
-      line2: Color(0xFFEFF2F6),
-      good: Color(0xFF2AA872),
-      goodTint: Color(0xFFEAF8F1),
-      warn: Color(0xFFDDB64A),
-      warnTint: Color(0xFFFFF5D9),
-      bad: Color(0xFFD9573F),
-      badTint: Color(0xFFFFEFEC),
-      violet: Color(0xFF884FD6),
-      violetTint: Color(0xFFF2EAFB),
+      primaryTint: Color(0xFF1B1F35),
+      primaryTintStrong: Color(0xFF9AA3FF),
+      primarySoft: Color(0xFF11131F),
+      background: Color(0xFF0A0B10),
+      sunken: Color(0xFF101219),
+      card: Color(0xFF151722),
+      ink: Color(0xFFF7F8FB),
+      ink2: Color(0xFFD4D8E4),
+      ink3: Color(0xFF8B91A3),
+      ink4: Color(0xFF5F6575),
+      line: Color(0x1FFFFFFF),
+      line2: Color(0x12FFFFFF),
+      good: Color(0xFF34D399),
+      goodTint: Color(0x1F34D399),
+      warn: Color(0xFFFBBF24),
+      warnTint: Color(0x1FFBBF24),
+      bad: Color(0xFFFB7185),
+      badTint: Color(0x1FFB7185),
+      violet: Color(0xFFC084FC),
+      violetTint: Color(0x21C084FC),
     );
   }
+
+  factory WritingCoachColors.day() {
+    return const WritingCoachColors(
+      primary: Color(0xFF4551E6),
+      primaryInk: Color(0xFFFFFFFF),
+      primaryTint: Color(0xFFE9ECFF),
+      primaryTintStrong: Color(0xFF4F5DFF),
+      primarySoft: Color(0xFFF1F3FF),
+      background: Color(0xFFF5F7FF),
+      sunken: Color(0xFFEDF1FB),
+      card: Color(0xFFFFFFFF),
+      ink: Color(0xFF101828),
+      ink2: Color(0xFF334155),
+      ink3: Color(0xFF667085),
+      ink4: Color(0xFF98A2B3),
+      line: Color(0x1F1D2A48),
+      line2: Color(0x141D2A48),
+      good: Color(0xFF059669),
+      goodTint: Color(0x1A059669),
+      warn: Color(0xFFB7791F),
+      warnTint: Color(0x1FB7791F),
+      bad: Color(0xFFDC2626),
+      badTint: Color(0x1ADC2626),
+      violet: Color(0xFF7C3AED),
+      violetTint: Color(0x1A7C3AED),
+    );
+  }
+
+  factory WritingCoachColors.accessible() {
+    return const WritingCoachColors(
+      primary: Color(0xFF38BDF8),
+      primaryInk: Color(0xFF001018),
+      primaryTint: Color(0xFF072436),
+      primaryTintStrong: Color(0xFF7DD3FC),
+      primarySoft: Color(0xFF061823),
+      background: Color(0xFF000000),
+      sunken: Color(0xFF0B0B0B),
+      card: Color(0xFF111111),
+      ink: Color(0xFFFFFFFF),
+      ink2: Color(0xFFF2F4F7),
+      ink3: Color(0xFFD0D5DD),
+      ink4: Color(0xFFB8C0CC),
+      line: Color(0x42FFFFFF),
+      line2: Color(0x2EFFFFFF),
+      good: Color(0xFF4ADE80),
+      goodTint: Color(0x2B4ADE80),
+      warn: Color(0xFFFACC15),
+      warnTint: Color(0x2EFACC15),
+      bad: Color(0xFFFB7185),
+      badTint: Color(0x2EFB7185),
+      violet: Color(0xFFD8B4FE),
+      violetTint: Color(0x2BD8B4FE),
+    );
+  }
+
+  factory WritingCoachColors.light() => WritingCoachColors.day();
+
+  bool get isDark => background.computeLuminance() < 0.45;
+  bool get isHighContrast => background == const Color(0xFF000000);
 
   @override
   WritingCoachColors copyWith({

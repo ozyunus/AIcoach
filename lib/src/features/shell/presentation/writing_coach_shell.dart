@@ -20,11 +20,14 @@ class WritingCoachShell extends ConsumerWidget {
   Widget build(BuildContext context, WidgetRef ref) {
     final activeTab = ref.watch(selectedTabProvider);
     final colors = context.colors;
+    final overlayStyle = colors.isDark
+        ? SystemUiOverlayStyle.light
+        : SystemUiOverlayStyle.dark;
 
     return AnnotatedRegion<SystemUiOverlayStyle>(
-      value: SystemUiOverlayStyle.dark.copyWith(
+      value: overlayStyle.copyWith(
         statusBarColor: Colors.transparent,
-        systemNavigationBarColor: colors.card,
+        systemNavigationBarColor: colors.background,
       ),
       child: Scaffold(
         extendBody: true,
@@ -59,21 +62,43 @@ class _BottomTabBar extends StatelessWidget {
         filter: ImageFilter.blur(sigmaX: 20, sigmaY: 20),
         child: Container(
           height: AppSpacing.bottomNavHeight,
-          padding: const EdgeInsets.fromLTRB(10, 6, 10, 26),
+          padding: const EdgeInsets.fromLTRB(14, 9, 14, 26),
           decoration: BoxDecoration(
-            color: colors.card.withValues(alpha: 0.82),
-            border: Border(top: BorderSide(color: colors.line2)),
+            gradient: LinearGradient(
+              begin: Alignment.topCenter,
+              end: Alignment.bottomCenter,
+              colors: [
+                colors.background.withValues(alpha: 0),
+                colors.background.withValues(alpha: 0.94),
+                colors.background,
+              ],
+            ),
           ),
-          child: Row(
-            mainAxisAlignment: MainAxisAlignment.spaceAround,
-            crossAxisAlignment: CrossAxisAlignment.start,
-            children: [
-              _TabButton(tab: AppTab.home, activeTab: activeTab),
-              _TabButton(tab: AppTab.progress, activeTab: activeTab),
-              _TabButton(tab: AppTab.write, activeTab: activeTab, center: true),
-              _TabButton(tab: AppTab.coach, activeTab: activeTab),
-              _TabButton(tab: AppTab.profile, activeTab: activeTab),
-            ],
+          child: Container(
+            height: 58,
+            decoration: BoxDecoration(
+              color: colors.card.withValues(alpha: colors.isDark ? 0.9 : 0.94),
+              borderRadius: BorderRadius.circular(24),
+              border: Border.all(
+                color: colors.line,
+                width: colors.isHighContrast ? 2 : 1,
+              ),
+            ),
+            child: Row(
+              mainAxisAlignment: MainAxisAlignment.spaceAround,
+              crossAxisAlignment: CrossAxisAlignment.center,
+              children: [
+                _TabButton(tab: AppTab.home, activeTab: activeTab),
+                _TabButton(tab: AppTab.progress, activeTab: activeTab),
+                _TabButton(
+                  tab: AppTab.write,
+                  activeTab: activeTab,
+                  center: true,
+                ),
+                _TabButton(tab: AppTab.coach, activeTab: activeTab),
+                _TabButton(tab: AppTab.profile, activeTab: activeTab),
+              ],
+            ),
           ),
         ),
       ),
@@ -113,25 +138,24 @@ class _TabButton extends ConsumerWidget {
               mainAxisSize: MainAxisSize.min,
               children: [
                 if (center)
-                  Transform.translate(
-                    offset: const Offset(0, -10),
-                    child: Container(
-                      width: 50,
-                      height: 36,
-                      decoration: BoxDecoration(
-                        color: colors.primary,
-                        borderRadius: BorderRadius.circular(14),
-                        boxShadow: [
-                          BoxShadow(
-                            color: colors.primary.withValues(alpha: 0.34),
-                            blurRadius: 22,
-                            spreadRadius: -8,
-                            offset: const Offset(0, 8),
-                          ),
-                        ],
-                      ),
-                      child: Icon(tab.icon, color: colors.primaryInk, size: 22),
+                  Container(
+                    width: 32,
+                    height: 32,
+                    decoration: BoxDecoration(
+                      color: colors.primary,
+                      borderRadius: BorderRadius.circular(13),
+                      boxShadow: colors.isHighContrast
+                          ? const []
+                          : [
+                              BoxShadow(
+                                color: colors.primary.withValues(alpha: 0.34),
+                                blurRadius: 22,
+                                spreadRadius: -10,
+                                offset: const Offset(0, 10),
+                              ),
+                            ],
                     ),
+                    child: Icon(tab.icon, color: colors.primaryInk, size: 19),
                   )
                 else
                   Icon(tab.icon, color: iconColor, size: 23),
