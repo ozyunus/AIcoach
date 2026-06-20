@@ -101,10 +101,11 @@ Commit'e alinmayacaklar:
 
 Dikkat notlari:
 
-- `ios/Runner/GoogleService-Info.plist` commit adayidir; private repo icin
-  normal, public repo yapilacaksa tekrar degerlendirilmeli.
+- `ios/Runner/GoogleService-Info.plist` real dosyasi commit disidir; sadece
+  `ios/Runner/GoogleService-Info.plist.example` commitlenir. Daha once pushlanan
+  Google/Firebase key rotate ve restrict edilmelidir.
 - Android icin `android/app/google-services.json` su an yok; Firebase config
-  kontrolunde tamamlanmali.
+  kontrolunde tamamlanmali ve real dosya commitlenmemelidir.
 - `ios/Runner/photo2.jpg` kodda referanslanmiyor ve `.gitignore` ile commit
   disi birakildi.
 
@@ -115,7 +116,8 @@ Dogru / hazir gorunenler:
 - `.firebaserc` default proje alias'i `aicoach-604d8`.
 - `firebase.json` Functions source olarak `functions/` klasorunu gosteriyor ve
   deploy oncesi `npm --prefix "$RESOURCE_DIR" run build` calistiriyor.
-- `ios/Runner/GoogleService-Info.plist` mevcut.
+- `ios/Runner/GoogleService-Info.plist` localde mevcut olmali; git tarafinda
+  ignore edilir.
 - iOS Firebase bundle id `com.aicoach.aiCoach`; Xcode project bundle id ile
   eslesiyor.
 - iOS `Info.plist` icinde Google Sign-In icin reversed client URL scheme var.

@@ -51,5 +51,11 @@ firebase-debug.log*
 firestore-debug.log*
 ui-debug.log*
 
+# Firebase client config files contain project identifiers and API keys.
+# Keep real files local and commit only the matching *.example templates.
+ios/Runner/GoogleService-Info.plist
+android/app/google-services.json
+lib/firebase_options.dart
+
 # Local/reference images that are not app assets
 ios/Runner/photo2.jpg

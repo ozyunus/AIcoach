@@ -127,9 +127,12 @@ function contract and deployment notes.
 ## Firebase Notes
 
 - The current Firebase project alias is defined in `.firebaserc`.
-- iOS has `ios/Runner/GoogleService-Info.plist`.
-- Android still needs `android/app/google-services.json` and the Google
-  Services Gradle plugin before real Android Firebase testing.
+- iOS needs a local `ios/Runner/GoogleService-Info.plist`, copied from Firebase
+  Console. The real file is ignored by git; commit only
+  `ios/Runner/GoogleService-Info.plist.example`.
+- Android still needs a local `android/app/google-services.json` and the Google
+  Services Gradle plugin before real Android Firebase testing. The real config
+  file is ignored by git.
 - Web and desktop Firebase support should use generated FlutterFire options
   before being treated as production-ready targets.
 

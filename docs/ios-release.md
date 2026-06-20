@@ -7,7 +7,9 @@ This is the current release path for the iOS-first build.
 - Bundle id: `com.aicoach.aiCoach`
 - Display name: `AI Coach`
 - iOS minimum deployment target: `15.0`
-- iOS Firebase config exists at `ios/Runner/GoogleService-Info.plist`.
+- iOS Firebase config must exist locally at
+  `ios/Runner/GoogleService-Info.plist`; the real file is ignored by git.
+  Use `ios/Runner/GoogleService-Info.plist.example` as the committed template.
 - Google Sign-In URL scheme is present in `ios/Runner/Info.plist`.
 - Apple Sign-In entitlement is present at `ios/Runner/Runner.entitlements`.
 - Custom AppIcon set is present in
@@ -56,6 +58,10 @@ firebase deploy --only functions --project aicoach-604d8
 
 Do not commit Anthropic keys. Keep local emulator values in
 `functions/.secret.local`, which is ignored by git.
+
+Do not commit real Firebase client config files either. Keep
+`ios/Runner/GoogleService-Info.plist` local and rotate/restrict exposed Google
+API keys in Google Cloud Console if a config file was ever pushed.
 
 ## Apple Signing Setup
 
