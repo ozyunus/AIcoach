@@ -2,6 +2,12 @@ import 'package:ai_coach/src/core/application/writing_coach_state.dart';
 import 'package:ai_coach/src/features/auth/data/auth_repository.dart';
 
 class MockAuthRepository implements AuthRepository {
+  MockAuthRepository({bool signedIn = false}) {
+    if (signedIn) {
+      _currentUser = _previewUser();
+    }
+  }
+
   UserProfile? _currentUser;
 
   @override
@@ -46,6 +52,19 @@ class MockAuthRepository implements AuthRepository {
   @override
   Future<void> signOut() async {
     _currentUser = null;
+  }
+
+  UserProfile _previewUser() {
+    return UserProfile(
+      id: 'mock-preview-user',
+      email: 'yunus@example.com',
+      nickname: 'Yunus',
+      examType: ExamType.ielts,
+      credits: 12,
+      writingHealthScore: 82,
+      currentStreak: 4,
+      createdAt: DateTime.now(),
+    );
   }
 
   UserProfile _signIn({

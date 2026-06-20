@@ -56,7 +56,7 @@ class WritingCoachController extends Notifier<WritingCoachState> {
       }
 
       if (user == null) {
-        state = WritingCoachState.initial();
+        state = WritingCoachState.initial(themeMode: state.themeMode);
         return;
       }
 
@@ -84,7 +84,7 @@ class WritingCoachController extends Notifier<WritingCoachState> {
         AuthProvider.apple => await repository.signInWithApple(),
       };
 
-      state = WritingCoachState.initial(user: user);
+      state = WritingCoachState.initial(user: user, themeMode: state.themeMode);
       await loadRecentEssays();
     } on Object catch (error) {
       state = state.copyWith(
@@ -96,7 +96,7 @@ class WritingCoachController extends Notifier<WritingCoachState> {
 
   Future<void> signOut() async {
     await ref.read(authRepositoryProvider).signOut();
-    state = WritingCoachState.initial();
+    state = WritingCoachState.initial(themeMode: state.themeMode);
   }
 
   Future<void> selectExam(ExamType examType) async {
@@ -279,7 +279,10 @@ class WritingCoachState {
         .fold(0, (total, stat) => total + stat.count);
   }
 
-  factory WritingCoachState.initial({UserProfile? user}) {
+  factory WritingCoachState.initial({
+    UserProfile? user,
+    WritingCoachThemeMode themeMode = WritingCoachThemeMode.dark,
+  }) {
     return WritingCoachState(
       user: user,
       essays: [],
@@ -308,7 +311,7 @@ class WritingCoachState {
       ],
       draftEssay: '',
       latestAnalysis: null,
-      themeMode: WritingCoachThemeMode.dark,
+      themeMode: themeMode,
       isAuthenticating: false,
       isLoadingEssays: false,
       isSubmittingEssay: false,
