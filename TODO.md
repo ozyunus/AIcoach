@@ -57,7 +57,11 @@ Firebase + Claude akisini dogrulama.
 - [ ] `npm audit` uuid/firebase-admin moderate advisory'sini upstream uyumlu fix
       ciktiginda kapat; `npm audit fix --force` ile Admin SDK downgrade yapma.
 - [ ] Yeni Firebase projesinde Google Sign-In iOS OAuth client'i uret, plist'i yenile ve iOS URL scheme'i yeni client id ile guncelle.
-- [ ] Firestore rules'i yeni Firebase projesine deploy et ve console'da aktif rules'u dogrula.
+- [x] Firestore rules'i yeni Firebase projesine deploy et ve aktif release'i
+      dogrula. Rules client tarafindan kredi/skor/essay yazimini engelleyecek
+      sekilde daraltildi.
+- [x] Firestore default database icin delete protection'i ac.
+- [ ] Firestore PITR/backup politikasini Blaze/butce karariyla degerlendir.
 - [x] Client-side credit/essay write fallback'i release akistan cikarildi; kredi dusme ve analiz yazma varsayilan olarak callable backend'den gecer.
 - [ ] TestFlight icin signed IPA/archive uret ve yukle.
 - [ ] Gercek Firebase auth akisini test et.
@@ -145,9 +149,10 @@ Eksik / dikkat isteyenler:
   uretilmeli.
 - Gercek Firebase auth ve callable function testi icin ilk hedef iOS simulator
   veya iOS cihaz olmali; Android testi config tamamlanana kadar beklemeli.
-- MVP Firestore rules `users/{userId}` update iznini kullaniciya birakiyor;
-  release app tarafinda essay submit varsayilan olarak callable backend'e
-  gider. Production billing oncesi rules daha da daraltilmali.
+- Firestore rules `users/{userId}` update iznini yalnizca profil/auth alanlariyla
+  sinirlar; kredi, skor, essay, analiz ve error stat yazimi backend'e aittir.
+- Firestore `(default)` database `nam5` lokasyonunda olusturuldu ve delete
+  protection acildi. PITR maliyet/veri saklama karari nedeniyle simdilik kapali.
 
 ## Anthropic Config Kontrolu
 

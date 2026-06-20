@@ -10,26 +10,73 @@ service cloud.firestore {
       return signedIn() && request.auth.uid == userId;
     }
 
+    function validExamType(examType) {
+      return examType in ['ielts', 'toefl'];
+    }
+
+    function validUserCreate(userId) {
+      return owns(userId)
+        && request.resource.data.keys().hasOnly([
+          'id',
+          'email',
+          'nickname',
+          'examType',
+          'credits',
+          'writingHealthScore',
+          'currentStreak',
+          'createdAt',
+          'updatedAt',
+        ])
+        && request.resource.data.id == userId
+        && request.resource.data.email is string
+        && request.resource.data.nickname is string
+        && validExamType(request.resource.data.examType)
+        && request.resource.data.credits == 3
+        && request.resource.data.writingHealthScore == 62
+        && request.resource.data.currentStreak == 0;
+    }
+
+    function validUserProfileUpdate(userId) {
+      return owns(userId)
+        && request.resource.data.diff(resource.data).affectedKeys().hasOnly([
+          'email',
+          'nickname',
+          'examType',
+          'lastLoginAt',
+          'updatedAt',
+        ])
+        && request.resource.data.id == resource.data.id
+        && request.resource.data.credits == resource.data.credits
+        && request.resource.data.writingHealthScore == resource.data.writingHealthScore
+        && request.resource.data.currentStreak == resource.data.currentStreak
+        && (!('email' in request.resource.data) ||
+          request.resource.data.email is string)
+        && (!('nickname' in request.resource.data) ||
+          request.resource.data.nickname is string)
+        && (!('examType' in request.resource.data) ||
+          validExamType(request.resource.data.examType));
+    }
+
     match /users/{userId} {
-      allow read, create, update: if owns(userId);
+      allow read: if owns(userId);
+      allow create: if validUserCreate(userId);
+      allow update: if validUserProfileUpdate(userId);
+      allow delete: if false;
     }
 
     match /essays/{essayId} {
       allow read: if owns(resource.data.userId);
-      allow create: if signedIn()
-        && request.resource.data.userId == request.auth.uid;
-      allow update, delete: if false;
+      allow create, update, delete: if false;
     }
 
     match /essay_analyses/{analysisId} {
       allow read: if owns(resource.data.userId);
-      allow create: if signedIn()
-        && request.resource.data.userId == request.auth.uid;
-      allow update, delete: if false;
+      allow create, update, delete: if false;
     }
 
     match /user_error_stats/{userId} {
-      allow read, create, update: if owns(userId);
+      allow read: if owns(userId);
+      allow create, update, delete: if false;
     }
   }
 }

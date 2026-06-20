@@ -200,48 +200,18 @@ Do not overbuild the database before the first working essay analysis flow.
 
 ---
 
-## MVP Security Rules
+## Security Rules
 
-Use these Firestore rules for the current client-side MVP flow:
+The deployable rules live in `firestore.rules` and are connected through
+`firebase.json`.
 
-```text
-rules_version = '2';
+Security posture:
 
-service cloud.firestore {
-  match /databases/{database}/documents {
-    function signedIn() {
-      return request.auth != null;
-    }
-
-    function owns(userId) {
-      return signedIn() && request.auth.uid == userId;
-    }
-
-    match /users/{userId} {
-      allow read, create, update: if owns(userId);
-    }
-
-    match /essays/{essayId} {
-      allow read: if owns(resource.data.userId);
-      allow create: if signedIn()
-        && request.resource.data.userId == request.auth.uid;
-      allow update, delete: if false;
-    }
-
-    match /essay_analyses/{analysisId} {
-      allow read: if owns(resource.data.userId);
-      allow create: if signedIn()
-        && request.resource.data.userId == request.auth.uid;
-      allow update, delete: if false;
-    }
-
-    match /user_error_stats/{userId} {
-      allow read, create, update: if owns(userId);
-    }
-  }
-}
-```
-
-These rules are intentionally permissive for `users/{userId}` updates because
-credits are still consumed from the Flutter client. Move credit consumption and
-essay analysis writes to a trusted backend before production billing.
+- Users can read their own profile, essays, analyses, and error stats.
+- Users can create their own profile with fixed initial credit/score fields.
+- Users can update only profile/auth fields: `email`, `nickname`, `examType`,
+  `lastLoginAt`, and `updatedAt`.
+- Users cannot write `credits`, writing scores, essays, analyses, or error
+  stats from the client.
+- Essay submission and credit consumption must go through the callable backend,
+  which writes with Admin SDK privileges.
