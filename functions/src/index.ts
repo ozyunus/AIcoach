@@ -1,16 +1,14 @@
 import {initializeApp} from "firebase-admin/app";
 import {FieldValue, getFirestore} from "firebase-admin/firestore";
 import * as logger from "firebase-functions/logger";
-import {defineSecret, defineString} from "firebase-functions/params";
+import {defineSecret} from "firebase-functions/params";
 import {HttpsError, onCall} from "firebase-functions/v2/https";
 
 initializeApp();
 
 const db = getFirestore();
 const anthropicApiKey = defineSecret("ANTHROPIC_API_KEY");
-const anthropicModel = defineString("ANTHROPIC_MODEL", {
-  default: "claude-sonnet-4-6",
-});
+const defaultAnthropicModel = "claude-sonnet-4-6";
 const anthropicVersion = "2023-06-01";
 
 interface CorrectionPayload {
@@ -306,7 +304,7 @@ async function analyzeEssayWithClaude(
       "x-api-key": apiKey,
     },
     body: JSON.stringify({
-      model: anthropicModel.value(),
+      model: anthropicModel(),
       max_tokens: 1800,
       temperature: 0,
       system:
@@ -343,6 +341,10 @@ async function analyzeEssayWithClaude(
   const parsed = parseClaudeJson(text);
 
   return analysisFromClaudePayload(parsed, request.examType);
+}
+
+function anthropicModel(): string {
+  return process.env.ANTHROPIC_MODEL?.trim() || defaultAnthropicModel;
 }
 
 function buildEssayEvaluationPrompt(request: AnalyzeEssayRequest): string {

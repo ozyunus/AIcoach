@@ -52,7 +52,7 @@ Firebase + Claude akisini dogrulama.
 - [x] iOS simulator veya Android emulator uzerinde uygulamayi calistir.
 - [x] iOS icin custom AppIcon setini default Flutter ikonundan degistir.
 - [ ] Apple Developer Team ID / signing ayarlarini Xcode Runner target'ina bagla.
-- [ ] Firebase project'i Blaze plana gecir, `ANTHROPIC_API_KEY` secret'ini set et ve Functions deploy et.
+- [x] Firebase project'i Blaze plana gecir, `ANTHROPIC_API_KEY` secret'ini set et ve Functions deploy et.
 - [ ] Her push oncesi guvenlik kontrollerini calistir; temiz sonuc almadan push yapma.
 - [ ] `npm audit` uuid/firebase-admin moderate advisory'sini upstream uyumlu fix
       ciktiginda kapat; `npm audit fix --force` ile Admin SDK downgrade yapma.
@@ -160,6 +160,10 @@ Dogru / hazir gorunenler:
 
 - `functions/src/index.ts` icinde `ANTHROPIC_API_KEY` `defineSecret` ile
   tanimli ve `submitEssay` callable function'ina `secrets` listesiyle bagli.
+- `ANTHROPIC_API_KEY` Firebase Secret Manager'da set edildi; deploy loglarinda
+  yalnizca secret version metadata'si goruldu, secret degeri aciga cikmadi.
+- `submitEssay` Cloud Functions v2 callable olarak `us-central1` bolgesinde
+  `nodejs24` runtime ile ACTIVE durumda.
 - Secret eksikse function `failed-precondition` hatasi donduruyor; sessiz
   sekilde bos key ile Claude'a istek atmiyor.
 - Claude request'i backend'den `https://api.anthropic.com/v1/messages`
@@ -169,17 +173,15 @@ Dogru / hazir gorunenler:
 - Local emulator icin `functions/.secret.local.example` eklendi; gercek
   `functions/.secret.local` dosyasi git tarafindan ignore ediliyor.
 - `npm --prefix functions run build` temiz geciyor.
+- Cloud Functions Artifact Registry cleanup policy `us-central1` icin 7 gun
+  retention ile kuruldu.
 
 Eksik / dikkat isteyenler:
 
-- Firebase Secret Manager API `dear-diary-483614` icin Blaze plan gerektiriyor.
-  `firebase functions:secrets:get ANTHROPIC_API_KEY --project dear-diary-483614`
-  komutu Blaze gereksinimi nedeniyle durdu; deploy/test oncesi project Blaze
-  plana gecirilmeli.
-- Blaze sonrasi `firebase functions:secrets:set ANTHROPIC_API_KEY --project
-  dear-diary-483614` calistirilmali ve ardindan Functions deploy edilmeli.
 - Model ID bilincli olarak pinlenmis durumda; yeni Anthropic modeline gecmek
   istenirse `ANTHROPIC_MODEL` deploy/runtime config'i bilincli guncellenmeli.
+- Firebase CLI `firebase-functions` paketini newer major icin uyariyor; breaking
+  change riski nedeniyle ayri bakilmali.
 
 ## Push Guvenlik Kapisi
 
