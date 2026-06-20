@@ -3,18 +3,22 @@ import 'package:ai_coach/src/core/firebase/firebase_bootstrap.dart';
 import 'package:ai_coach/src/features/write/data/firebase_essay_repository.dart';
 import 'package:ai_coach/src/features/write/data/firebase_functions_essay_repository.dart';
 import 'package:ai_coach/src/features/write/data/mock_essay_repository.dart';
+import 'package:flutter/foundation.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
-const _useFunctionsEssaySubmit = bool.fromEnvironment('AI_COACH_USE_FUNCTIONS');
+const _useFunctionsEssaySubmit = bool.fromEnvironment(
+  'AI_COACH_USE_FUNCTIONS',
+  defaultValue: true,
+);
 
 final essayRepositoryProvider = Provider<EssayRepository>((ref) {
   final bootstrap = ref.watch(firebaseBootstrapProvider);
 
-  if (bootstrap.isReady && _useFunctionsEssaySubmit) {
+  if (bootstrap.isReady && (_useFunctionsEssaySubmit || kReleaseMode)) {
     return FirebaseFunctionsEssayRepository();
   }
 
-  if (bootstrap.isReady) {
+  if (bootstrap.isReady && kDebugMode) {
     return FirebaseEssayRepository();
   }
 

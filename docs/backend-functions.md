@@ -2,8 +2,8 @@
 
 ## Current Endpoint
 
-The Flutter app can call this Firebase callable function when the app is run
-with `AI_COACH_USE_FUNCTIONS=true`:
+The Flutter app submits essays through this Firebase callable function by
+default when Firebase is configured:
 
 ```text
 submitEssay
@@ -63,7 +63,7 @@ Response:
 live in Firebase Secret Manager, not in Flutter or Firestore:
 
 ```sh
-firebase functions:secrets:set ANTHROPIC_API_KEY --project aicoach-604d8
+firebase functions:secrets:set ANTHROPIC_API_KEY --project dear-diary-483614
 ```
 
 Firebase Functions secrets use Google Secret Manager. The Firebase project must
@@ -102,14 +102,18 @@ npm --prefix functions run build
 Deploy:
 
 ```sh
-firebase deploy --only functions --project aicoach-604d8
+firebase deploy --only functions --project dear-diary-483614
 ```
 
 Run Flutter against callable functions:
 
 ```sh
-flutter run --dart-define=AI_COACH_USE_FUNCTIONS=true
+flutter run
 ```
+
+Callable function submission is the default. The older client-side Firestore
+essay writer is retained only for debug/local fallback runs and must not be
+used for production billing flows.
 
 ## Current Behavior
 

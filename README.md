@@ -74,17 +74,22 @@ Install Flutter dependencies:
 flutter pub get
 ```
 
-Run with the default local/mock repository behavior:
+Run the app:
 
 ```sh
 flutter run
 ```
 
-Run against Firebase callable functions:
+Callable function submission is the default when Firebase is configured. For
+local preview without Firebase, the app falls back to mock repositories.
+
+Debug-only client-side Firestore essay writing can be forced with:
 
 ```sh
-flutter run --dart-define=AI_COACH_USE_FUNCTIONS=true
+flutter run --dart-define=AI_COACH_USE_FUNCTIONS=false
 ```
+
+The client-side writer is retained only for debug/local fallback runs.
 
 Run checks:
 
@@ -105,7 +110,7 @@ npm --prefix functions run build
 Configure the Anthropic key in Firebase Secret Manager:
 
 ```sh
-firebase functions:secrets:set ANTHROPIC_API_KEY --project aicoach-604d8
+firebase functions:secrets:set ANTHROPIC_API_KEY --project dear-diary-483614
 ```
 
 The Firebase project must be on the Blaze plan before Secret Manager can be

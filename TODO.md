@@ -1,6 +1,6 @@
 # AIcoach TODO
 
-Son guncelleme: 2026-06-18
+Son guncelleme: 2026-06-20
 
 Bu dosya "nerede kalmistik?" sorusunun kisa cevabi icin tutulur.
 Bir is tamamlandikca ilgili satir `[ ]` yerine `[x]` yapilir.
@@ -53,6 +53,12 @@ Firebase + Claude akisini dogrulama.
 - [x] iOS icin custom AppIcon setini default Flutter ikonundan degistir.
 - [ ] Apple Developer Team ID / signing ayarlarini Xcode Runner target'ina bagla.
 - [ ] Firebase project'i Blaze plana gecir, `ANTHROPIC_API_KEY` secret'ini set et ve Functions deploy et.
+- [ ] Her push oncesi guvenlik kontrollerini calistir; temiz sonuc almadan push yapma.
+- [ ] `npm audit` uuid/firebase-admin moderate advisory'sini upstream uyumlu fix
+      ciktiginda kapat; `npm audit fix --force` ile Admin SDK downgrade yapma.
+- [ ] Yeni Firebase projesinde Google Sign-In iOS OAuth client'i uret, plist'i yenile ve iOS URL scheme'i yeni client id ile guncelle.
+- [ ] Firestore rules'i yeni Firebase projesine deploy et ve console'da aktif rules'u dogrula.
+- [x] Client-side credit/essay write fallback'i release akistan cikarildi; kredi dusme ve analiz yazma varsayilan olarak callable backend'den gecer.
 - [ ] TestFlight icin signed IPA/archive uret ve yukle.
 - [ ] Gercek Firebase auth akisini test et.
 - [ ] Gercek essay submit + Claude analiz akisini uctan uca test et.
@@ -113,20 +119,25 @@ Dikkat notlari:
 
 Dogru / hazir gorunenler:
 
-- `.firebaserc` default proje alias'i `aicoach-604d8`.
+- `.firebaserc` default proje alias'i `dear-diary-483614`.
 - `firebase.json` Functions source olarak `functions/` klasorunu gosteriyor ve
   deploy oncesi `npm --prefix "$RESOURCE_DIR" run build` calistiriyor.
+- `firebase.json` `firestore.rules` dosyasini deploy config'ine bagliyor.
 - `ios/Runner/GoogleService-Info.plist` localde mevcut olmali; git tarafinda
   ignore edilir.
 - iOS Firebase bundle id `com.aicoach.aiCoach`; Xcode project bundle id ile
   eslesiyor.
-- iOS `Info.plist` icinde Google Sign-In icin reversed client URL scheme var.
+- Eski Google Sign-In URL scheme'i `Info.plist` icinden kaldirildi; yeni
+  Firebase projesinde iOS OAuth client uretilince yeni scheme eklenmeli.
 - Uygulama Firebase init basarisiz olursa mock repository akisine dusuyor; bu
   local preview icin bilincli fallback.
 
 Eksik / dikkat isteyenler:
 
 - Android icin `android/app/google-services.json` yok.
+- Yeni `ios/Runner/GoogleService-Info.plist` icinde `CLIENT_ID` ve
+  `REVERSED_CLIENT_ID` yok; gercek Google auth testi oncesi Firebase Auth
+  Google provider / iOS OAuth client kurulumu tamamlanmali.
 - Android Gradle tarafinda `com.google.gms.google-services` plugin'i henuz
   ekli degil; native Android Firebase init icin tamamlanmali.
 - `lib/firebase_options.dart` yok ve `Firebase.initializeApp()` options almadan
@@ -134,6 +145,9 @@ Eksik / dikkat isteyenler:
   uretilmeli.
 - Gercek Firebase auth ve callable function testi icin ilk hedef iOS simulator
   veya iOS cihaz olmali; Android testi config tamamlanana kadar beklemeli.
+- MVP Firestore rules `users/{userId}` update iznini kullaniciya birakiyor;
+  release app tarafinda essay submit varsayilan olarak callable backend'e
+  gider. Production billing oncesi rules daha da daraltilmali.
 
 ## Anthropic Config Kontrolu
 
@@ -153,11 +167,26 @@ Dogru / hazir gorunenler:
 
 Eksik / dikkat isteyenler:
 
-- Firebase Secret Manager API `aicoach-604d8` icin Blaze plan gerektiriyor.
-  `firebase functions:secrets:get ANTHROPIC_API_KEY --project aicoach-604d8`
+- Firebase Secret Manager API `dear-diary-483614` icin Blaze plan gerektiriyor.
+  `firebase functions:secrets:get ANTHROPIC_API_KEY --project dear-diary-483614`
   komutu Blaze gereksinimi nedeniyle durdu; deploy/test oncesi project Blaze
   plana gecirilmeli.
 - Blaze sonrasi `firebase functions:secrets:set ANTHROPIC_API_KEY --project
-  aicoach-604d8` calistirilmali ve ardindan Functions deploy edilmeli.
+  dear-diary-483614` calistirilmali ve ardindan Functions deploy edilmeli.
 - Model ID bilincli olarak pinlenmis durumda; yeni Anthropic modeline gecmek
   istenirse `ANTHROPIC_MODEL` deploy/runtime config'i bilincli guncellenmeli.
+
+## Push Guvenlik Kapisi
+
+Her push oncesi su kontroller temiz gecmeli:
+
+- `git status --short --ignored` ile real Firebase config ve local secret
+  dosyalarinin ignored kaldigi dogrulanir.
+- Workspace ve commit history icinde gercek secret pattern'leri aranir:
+  Google API key, Anthropic/OpenAI key, JWT, private key, service-role token.
+- `git log --all -- ios/Runner/GoogleService-Info.plist
+  android/app/google-services.json lib/firebase_options.dart` bos donmeli.
+- `flutter analyze --no-pub` ve `flutter test --no-pub` temiz gecmeli.
+- `npm --prefix functions audit --omit=dev --audit-level=high` high/critical
+  bulmamalidir; moderate advisory'ler takip maddesine baglanir.
+- Push sadece bu kontrollerden sonra yapilir.

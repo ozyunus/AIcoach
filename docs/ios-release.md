@@ -39,11 +39,11 @@ provisioning profiles.
 
 2. Firebase Functions secrets require Blaze.
 
-`aicoach-604d8` must be upgraded to the Blaze plan before Secret Manager can be
+`dear-diary-483614` must be upgraded to the Blaze plan before Secret Manager can be
 enabled. The Firebase console upgrade URL is:
 
 ```text
-https://console.firebase.google.com/project/aicoach-604d8/usage/details
+https://console.firebase.google.com/project/dear-diary-483614/usage/details
 ```
 
 ## Firebase Functions Deploy
@@ -51,9 +51,9 @@ https://console.firebase.google.com/project/aicoach-604d8/usage/details
 After the project is on Blaze:
 
 ```sh
-firebase functions:secrets:set ANTHROPIC_API_KEY --project aicoach-604d8
+firebase functions:secrets:set ANTHROPIC_API_KEY --project dear-diary-483614
 npm --prefix functions run build
-firebase deploy --only functions --project aicoach-604d8
+firebase deploy --only functions --project dear-diary-483614
 ```
 
 Do not commit Anthropic keys. Keep local emulator values in
